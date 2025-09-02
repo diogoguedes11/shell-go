@@ -30,18 +30,23 @@ func main() {
 			case strings.HasPrefix(trimmed,"type"):
 				found := false
 				cmdName := trimmed[len("type")+1:]
-				for _, path := range paths {
-					fullPath := path + "/" + cmdName
-					if fileInfo, err := os.Stat(fullPath); err == nil {
-						if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
-							fmt.Printf("%s is %s\n", cmdName, fullPath)
-							found = true
-							break
+				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" {
+					fmt.Printf("%s is a shell builtin\n", cmdName)
+					break
+				} else if cmdName != "echo" || cmdName != "type" || cmdName != "exit" {
+					for _, path := range paths {
+						fullPath := path + "/" + cmdName
+						if fileInfo, err := os.Stat(fullPath); err == nil {
+							if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
+								fmt.Printf("%s is %s\n", cmdName, fullPath)
+								found = true
+								break
+							}
 						}
 					}
 				}
 				if !found {
-					fmt.Println(trimmed[len("type")+1:] + ": not found")
+					fmt.Println(cmdName + ": not found")
 				}
 			default:
 				fmt.Println(trimmed + ": command not found")
