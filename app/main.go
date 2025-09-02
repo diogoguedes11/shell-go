@@ -32,10 +32,12 @@ func main() {
 				cmdName := trimmed[len("type")+1:]
 				for _, path := range paths {
 					fullPath := path + "/" + cmdName
-					if _, err := os.Stat(fullPath); err == nil {
-						fmt.Printf("%s is %s\n", cmdName, fullPath)
-						found = true
-						break
+					if fileInfo, err := os.Stat(fullPath); err == nil {
+						if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
+							fmt.Printf("%s is %s\n", cmdName, fullPath)
+							found = true
+							break
+						}
 					}
 				}
 				if !found {
