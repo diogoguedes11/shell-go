@@ -33,7 +33,7 @@ func main() {
 				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
 					break
-				} else if cmdName != "echo" || cmdName != "type" || cmdName != "exit" {
+				} else {
 					for _, path := range paths {
 						fullPath := path + "/" + cmdName
 						if fileInfo, err := os.Stat(fullPath); err == nil {
