@@ -73,10 +73,8 @@ func main() {
 				}
 				if !found {
 					fmt.Println(programName + ": not found")
-					return
 				}
 		}
-		
 		
 	}
 }
