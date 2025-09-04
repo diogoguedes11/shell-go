@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -11,7 +13,6 @@ import (
 var _ = fmt.Fprint
 
 func main() {
-	// Uncomment this block to pass the first stage
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
@@ -49,6 +50,24 @@ func main() {
 					fmt.Println(cmdName + ": not found")
 				}
 			default:
+				parts := strings.Fields(trimmed)
+				programName := parts[0]
+				arguments := parts[1:]
+				for _, path := range paths {
+					fullPath := path + "/" + programName
+					if fileInfo, err := os.Stat(fullPath); err == nil {
+						if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
+							cmd := exec.Command(programName, arguments...)
+							cmd.Stdout = os.Stdout // allows me to get the output in my shell
+							cmd.Stderr = os.Stderr // allows me to get the error output in my shell
+							err := cmd.Run()
+							if err != nil {
+								log.Fatalf("Error executing the program: %s %v",programName,arguments)
+							}
+							return
+						}
+					}
+				}
 				fmt.Println(trimmed + ": command not found")
 		}
 		
