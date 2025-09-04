@@ -29,6 +29,13 @@ func main() {
 				os.Exit(0)
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
+			case strings.HasPrefix(trimmed,"pwd"):
+				pwd,err := os.Getwd()
+				if err != nil {
+					fmt.Fprintf(os.Stderr,"pwd: %v\n",err)
+				}else {
+					fmt.Println(pwd)
+				}
 			case strings.HasPrefix(trimmed,"type"):
 				cmdName := trimmed[len("type")+1:]
 				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" || cmdName == "pwd" {
