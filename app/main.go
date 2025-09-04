@@ -64,11 +64,10 @@ func main() {
 							if err != nil {
 								log.Fatalf("Error executing the program: %s %v",programName,arguments)
 							}
-							return
+							
 						}
 					}
 				}
-				fmt.Println(trimmed + ": command not found")
 		}
 		
 		
