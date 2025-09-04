@@ -14,6 +14,7 @@ var _ = fmt.Fprint
 
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
+	found := false
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
@@ -29,7 +30,6 @@ func main() {
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
 			case strings.HasPrefix(trimmed,"type"):
-				found := false
 				cmdName := trimmed[len("type")+1:]
 				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
@@ -53,6 +53,7 @@ func main() {
 				parts := strings.Fields(trimmed)
 				programName := parts[0]
 				arguments := parts[1:]
+				found = false
 				for _, path := range paths {
 					fullPath := path + "/" + programName
 					if fileInfo, err := os.Stat(fullPath); err == nil {
@@ -63,10 +64,15 @@ func main() {
 							err := cmd.Run()
 							if err != nil {
 								log.Fatalf("Error executing the program: %s %v",programName,arguments)
+								return
 							}
-							
-						}
+							found = true
+						} 
 					}
+				}
+				if !found {
+					fmt.Println(programName + ": not found")
+					return
 				}
 		}
 		
