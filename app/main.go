@@ -31,7 +31,7 @@ func main() {
 				fmt.Println(trimmed[len("echo")+1:])
 			case strings.HasPrefix(trimmed,"type"):
 				cmdName := trimmed[len("type")+1:]
-				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" {
+				if cmdName == "echo" || cmdName == "type" || cmdName == "exit" || cmdName == "pwd" {
 					fmt.Printf("%s is a shell builtin\n", cmdName)
 					break
 				} else {
