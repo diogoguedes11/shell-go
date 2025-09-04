@@ -59,7 +59,7 @@ func main() {
 					fullPath := path + "/" + programName
 					if fileInfo, err := os.Stat(fullPath); err == nil {
 						if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
-							cmd := exec.Command(programName, arguments...)
+							cmd := exec.Command(fullPath, arguments...)
 							cmd.Stdout = os.Stdout // allows me to get the output in my shell
 							cmd.Stderr = os.Stderr // allows me to get the error output in my shell
 							err := cmd.Run()
@@ -68,6 +68,7 @@ func main() {
 								return
 							}
 							found = true
+							break
 						} 
 					}
 				}
