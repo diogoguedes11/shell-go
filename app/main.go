@@ -29,6 +29,12 @@ func main() {
 				os.Exit(0)
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
+			case strings.HasPrefix(trimmed,"cd"):
+				fullPath := trimmed[len("cd")+1:]
+				if _, err := os.ReadDir(fullPath); err != nil {
+					fmt.Fprintf(os.Stderr, "cd: %v: No such file or directory\n", fullPath)
+				}
+				os.Chdir(fullPath)
 			case strings.HasPrefix(trimmed,"pwd"):
 				pwd,err := os.Getwd()
 				if err != nil {
