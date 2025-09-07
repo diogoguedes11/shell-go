@@ -38,7 +38,10 @@ func main() {
 				outputFile := strings.TrimSpace(parts[1])
 
 				cmd := exec.Command("sh","-c",cmdStr)
-				output , _ := cmd.CombinedOutput()
+				output , err := cmd.CombinedOutput()
+				if err != nil {
+					fmt.Println(string(output))
+				}
 				os.WriteFile(outputFile,output,0644)
 				continue
 				
