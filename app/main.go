@@ -45,6 +45,27 @@ func main() {
 				cmd.Run()
 				outFile.Close()
 				continue
+			case strings.Contains(trimmed,"2>>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,"2>>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+				cmd := exec.Command("sh","-c",cmdStr)
+
+				dir := filepath.Dir(outputFile)
+				if _ , err := os.Stat(dir) ; os.IsNotExist(err) {
+					os.MkdirAll(filepath.Dir(outputFile),0755)
+				}
+				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+					}
+				cmd.Stderr = f
+				cmd.Stdout = os.Stdout
+				cmd.Run()
+				f.Close()
+				continue
 			case strings.Contains(trimmed,"1>>"):
 				var parts []string;
 				parts = strings.SplitN(trimmed,"1>>",2)
