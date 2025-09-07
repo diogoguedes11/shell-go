@@ -32,7 +32,6 @@ func main() {
 				parts = strings.SplitN(trimmed,"2>",2)
 				cmdStr := strings.TrimSpace(parts[0])
 				outputFile := strings.TrimSpace(parts[1])
-				print(cmdStr)
 				cmd := exec.Command("sh","-c",cmdStr)
 				outFile , err := os.Create(outputFile)
 
