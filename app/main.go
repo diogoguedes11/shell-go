@@ -28,23 +28,6 @@ func main() {
 		switch {
 			case trimmed == "exit 0":
 				os.Exit(0)
-			case strings.Contains(trimmed,"2>"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,"2>",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.Create(outputFile)
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-				}
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = outFile
-				cmd.Run()
-				outFile.Close()
-				continue
 			case strings.Contains(trimmed,"2>>"):
 				var parts []string;
 				parts = strings.SplitN(trimmed,"2>>",2)
@@ -66,6 +49,7 @@ func main() {
 				cmd.Run()
 				f.Close()
 				continue
+			
 			case strings.Contains(trimmed,"1>>"):
 				var parts []string;
 				parts = strings.SplitN(trimmed,"1>>",2)
@@ -102,6 +86,23 @@ func main() {
 				cmd.Stderr = os.Stderr
 				cmd.Run()
 				f.Close()
+				continue
+			case strings.Contains(trimmed,"2>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,"2>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.Create(outputFile)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = outFile
+				cmd.Run()
+				outFile.Close()
 				continue
 			case strings.Contains(trimmed,"1>"):
 				var parts []string;
