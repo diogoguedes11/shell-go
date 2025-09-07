@@ -64,7 +64,6 @@ func main() {
 				}
 				defer outFile.Close()
 				cmd.Stderr = outFile
-				cmd.Stdout = os.Stdout
 				cmd.Run()
 				continue
 					
