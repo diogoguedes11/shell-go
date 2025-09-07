@@ -44,8 +44,8 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
 				}
-				cmd.Stdout = outFile
-				cmd.Stderr = os.Stderr
+				cmd.Stderr = outFile
+				cmd.Stdout = os.Stdout
 				cmd.Run()
 				outFile.Close()
 				continue
