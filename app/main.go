@@ -44,7 +44,7 @@ func main() {
 				cmd.Stderr = outFile
 				cmd.Run()
 				continue
-			case strings.Contains(trimmed,"1>") || strings.Contains(trimmed,">"):
+			case strings.Contains(trimmed,"1>"):
 				var parts []string;
 				if strings.Contains(trimmed,"1>") {
 					parts = strings.SplitN(trimmed,"1>",2)
@@ -66,7 +66,60 @@ func main() {
 				cmd.Stderr = os.Stderr
 				cmd.Run()
 				continue
-			
+			case strings.Contains(trimmed,"1>>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,"1>>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.OpenFile(outputFile,os.O_APPEND,0600)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				defer outFile.Close()
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				continue
+			case strings.Contains(trimmed,">>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,">>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.OpenFile(outputFile,os.O_APPEND,0600)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				defer outFile.Close()
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				continue
+			case strings.Contains(trimmed,">"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,">",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.Create(outputFile)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				defer outFile.Close()
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				continue
 					
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
