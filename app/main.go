@@ -73,16 +73,15 @@ func main() {
 				outputFile := strings.TrimSpace(parts[1])
 
 				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.OpenFile(outputFile,os.O_APPEND,0600)
-
+				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
-				}
-				defer outFile.Close()
-				cmd.Stdout = outFile
+					}
+				cmd.Stdout = f
 				cmd.Stderr = os.Stderr
 				cmd.Run()
+				f.Close()
 				continue
 			case strings.Contains(trimmed,">>"):
 				var parts []string;
@@ -91,16 +90,15 @@ func main() {
 				outputFile := strings.TrimSpace(parts[1])
 
 				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.OpenFile(outputFile,os.O_APPEND,0600)
-
+				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
-				}
-				defer outFile.Close()
-				cmd.Stdout = outFile
+					}
+				cmd.Stdout = f
 				cmd.Stderr = os.Stderr
 				cmd.Run()
+				f.Close()
 				continue
 			case strings.Contains(trimmed,">"):
 				var parts []string;
