@@ -38,11 +38,16 @@ func main() {
 				outputFile := strings.TrimSpace(parts[1])
 
 				cmd := exec.Command("sh","-c",cmdStr)
-				output , err := cmd.CombinedOutput()
+				outFile , err := os.Create(outputFile)
+
 				if err != nil {
-					fmt.Println(string(output))
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
 				}
-				os.WriteFile(outputFile,output,0644)
+				defer outFile.Close()
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
 				continue
 				
 			case strings.HasPrefix(trimmed,"echo"):
