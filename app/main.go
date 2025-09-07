@@ -27,6 +27,21 @@ func main() {
 		switch {
 			case trimmed == "exit 0":
 				os.Exit(0)
+			case strings.Contains(trimmed,"1>") || strings.Contains(trimmed,">"):
+				var parts []string;
+				if strings.Contains(trimmed,"1>") {
+					parts = strings.SplitN(trimmed,"1>",2)
+				} else {
+					parts = strings.SplitN(trimmed,">",2)
+				}
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				output , _ := cmd.CombinedOutput()
+				os.WriteFile(outputFile,output,0644)
+				continue
+				
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
 			case strings.HasPrefix(trimmed,"cd"):
