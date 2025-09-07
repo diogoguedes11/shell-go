@@ -39,10 +39,10 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
 				}
-				defer outFile.Close()
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = outFile
 				cmd.Run()
+				outFile.Close()
 				continue
 			case strings.Contains(trimmed,"1>"):
 				var parts []string;
@@ -61,10 +61,11 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
 				}
-				defer outFile.Close()
+				
 				cmd.Stdout = outFile
 				cmd.Stderr = os.Stderr
 				cmd.Run()
+				outFile.Close()
 				continue
 			case strings.Contains(trimmed,"1>>"):
 				var parts []string;
