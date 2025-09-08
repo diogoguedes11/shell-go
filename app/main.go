@@ -13,33 +13,16 @@ import (
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
 
-type ShellCompleter struct{}
-func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
-	lineStr := string(line)
-	userInput := lineStr[:pos]
-	builtins := []string{"echo","exit","type","pwd","cd"}
-
-	var completions [][]rune;
-
-	for _ , builtin := range builtins {
-		if strings.HasPrefix(builtin,userInput) {
-			completions = append(completions, []rune(builtin + " "))
-		}
-	}
-	if len(completions) > 0 {
-		return completions,len(userInput)
-	}
-
-	
-	return nil,0
-}
-
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
+	autoCompleter := readline.NewPrefixCompleter(
+		readline.PcItem("exit"),
+		readline.PcItem("echo"),
+	)
 	config := &readline.Config{
 		Prompt:          "$ ",
-		AutoComplete: &ShellCompleter{},
+		AutoComplete: autoCompleter,
 	}
 	rl, err := readline.NewEx(config)
 	if err != nil {
