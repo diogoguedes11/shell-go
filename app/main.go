@@ -25,7 +25,7 @@ func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 	for _ , builtin := range builtins {
 		if strings.HasPrefix(builtin,userInput) {
 			completions = append(completions, []rune(builtin + " "))
-			return completions, len(userInput)
+			return completions, len(builtin)
 		}
 	}
 	if len(completions) > 0 {
