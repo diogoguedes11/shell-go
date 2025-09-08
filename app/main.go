@@ -32,7 +32,7 @@ func main() {
 			os.Exit(1)
 		}
 		
-		command, err := rl.ReadLine()
+		command, err := rl.Readline()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
 			os.Exit(1)
