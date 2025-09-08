@@ -25,7 +25,7 @@ func main() {
 
 		fmt.Fprint(os.Stdout, "$ ")
 		config := &readline.Config{
-			Prompt: "$ ",
+			// Prompt: "$ ",
 			AutoComplete: autoCompleter,
 		}
 		rl, err := readline.NewEx(config)
