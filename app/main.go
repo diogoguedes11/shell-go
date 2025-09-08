@@ -20,18 +20,18 @@ func main() {
 		readline.PcItem("exit"),
 		readline.PcItem("echo"),
 	)
-	config := &readline.Config{
-		// Prompt: "$ ",
-		AutoComplete: autoCompleter,
-	}
-	rl, err := readline.NewEx(config)
 	if err != nil {
 		fmt.Fprint(os.Stderr, "Error creating readline instance: ", err)
 		os.Exit(1)
 	}
 	for {
 
-		fmt.Fprint(os.Stdout, "$")
+		// fmt.Fprint(os.Stdout, "$ ")
+		config := &readline.Config{
+			Prompt: "$ ",
+			AutoComplete: autoCompleter,
+		}
+		rl, err := readline.NewEx(config)
 
 		
 		command, err := rl.ReadLine()
