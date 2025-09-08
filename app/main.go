@@ -30,6 +30,10 @@ func main() {
 		os.Exit(1)
 	}
 	for {
+
+		fmt.Fprint(os.Stdout, " ")
+
+
 		command, err := rl.ReadLine()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
