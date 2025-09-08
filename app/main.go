@@ -47,7 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 	for {
-		command, err := rl.Readline()
+		command, err := rl.ReadLineWithConfig(config)
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
 			os.Exit(1)
