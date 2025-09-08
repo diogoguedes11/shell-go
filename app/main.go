@@ -21,7 +21,6 @@ func main() {
 		readline.PcItem("echo"),
 	)
 	config := &readline.Config{
-		Prompt:          "$ ",
 		AutoComplete: autoCompleter,
 	}
 	rl, err := readline.NewEx(config)
