@@ -21,6 +21,7 @@ func main() {
 		readline.PcItem("echo"),
 	)
 	config := &readline.Config{
+		Prompt: "$ ",
 		AutoComplete: autoCompleter,
 	}
 	rl, err := readline.NewEx(config)
@@ -29,7 +30,6 @@ func main() {
 		os.Exit(1)
 	}
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
 		command, err := rl.ReadLine()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
