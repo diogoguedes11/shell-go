@@ -20,10 +20,7 @@ func main() {
 		readline.PcItem("exit"),
 		readline.PcItem("echo"),
 	)
-	if err != nil {
-		fmt.Fprint(os.Stderr, "Error creating readline instance: ", err)
-		os.Exit(1)
-	}
+
 	for {
 
 		// fmt.Fprint(os.Stdout, "$ ")
@@ -32,7 +29,10 @@ func main() {
 			AutoComplete: autoCompleter,
 		}
 		rl, err := readline.NewEx(config)
-
+		if err != nil {
+			fmt.Fprint(os.Stderr, "Error creating readline instance: ", err)
+			os.Exit(1)
+		}
 		
 		command, err := rl.ReadLine()
 		if err != nil {
