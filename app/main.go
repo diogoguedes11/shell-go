@@ -20,12 +20,10 @@ func main() {
 		readline.PcItem("exit"),
 		readline.PcItem("echo"),
 	)
-
+	fmt.Fprint(os.Stdout, "$ ")
 	for {
-
-		fmt.Fprint(os.Stdout, "$ ")
 		config := &readline.Config{
-			// Prompt: "$ ",
+			Prompt: "$ ",
 			AutoComplete: autoCompleter,
 		}
 		rl, err := readline.NewEx(config)
