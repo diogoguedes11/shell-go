@@ -39,7 +39,7 @@ func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
 	config := &readline.Config{
-		Prompt:          "> ",
+		Prompt:          "$ ",
 		AutoComplete: &ShellCompleter{},
 	}
 	rl, err := readline.NewEx(config)
