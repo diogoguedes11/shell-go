@@ -96,6 +96,5 @@ func main() {
 					fmt.Println(programName + ": not found")
 				}
 		}
-		
 	}
 }
