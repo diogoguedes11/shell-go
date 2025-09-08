@@ -1,24 +1,54 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
+
+	"github.com/ergochat/readline"
 )
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
 
+type ShellCompleter struct{}
+func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
+	lineStr := string(line)
+	userInput := lineStr[:pos]
+	// fmt.Printf("DEBUG: line='%s', pos=%d\n", userInput, pos)
+	builtins := []string{"echo","exit","type","pwd","cd"}
+
+	var completions [][]rune;
+
+	for _ , builtin := range builtins {
+		if strings.HasPrefix(builtin,userInput) {
+			completions = append(completions, []rune(builtin + " "))
+			return completions, len(userInput)
+		}
+	}
+	if len(completions) > 0 {
+		return completions,len(userInput)
+	}
+
+	
+	return nil,0
+}
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
+	config := &readline.Config{
+		Prompt:          "> ",
+		AutoComplete: &ShellCompleter{},
+	}
+	rl, err := readline.NewEx(config)
+	if err != nil {
+		fmt.Fprint(os.Stderr, "Error creating readline instance: ", err)
+		os.Exit(1)
+	}
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
-		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		command, err := rl.Readline()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
 			os.Exit(1)
@@ -28,139 +58,8 @@ func main() {
 		switch {
 			case trimmed == "exit 0":
 				os.Exit(0)
-			case strings.Contains(trimmed,"2>>"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,"2>>",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-				cmd := exec.Command("sh","-c",cmdStr)
-
-				dir := filepath.Dir(outputFile)
-				if _ , err := os.Stat(dir) ; os.IsNotExist(err) {
-					os.MkdirAll(filepath.Dir(outputFile),0755)
-				}
-				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-					}
-				cmd.Stderr = f
-				cmd.Stdout = os.Stdout
-				cmd.Run()
-				f.Close()
-				continue
-			
-			case strings.Contains(trimmed,"1>>"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,"1>>",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-				cmd := exec.Command("sh","-c",cmdStr)
-
-				dir := filepath.Dir(outputFile)
-				if _ , err := os.Stat(dir) ; os.IsNotExist(err) {
-					os.MkdirAll(filepath.Dir(outputFile),0755)
-				}
-				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-					}
-				cmd.Stdout = f
-				cmd.Stderr = os.Stderr
-				cmd.Run()
-				f.Close()
-				continue
-			case strings.Contains(trimmed,">>"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,">>",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-				cmd := exec.Command("sh","-c",cmdStr)
-				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-					}
-				cmd.Stdout = f
-				cmd.Stderr = os.Stderr
-				cmd.Run()
-				f.Close()
-				continue
-			case strings.Contains(trimmed,"2>"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,"2>",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.Create(outputFile)
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-				}
-				cmd.Stdout = os.Stdout
-				cmd.Stderr = outFile
-				cmd.Run()
-				outFile.Close()
-				continue
-			case strings.Contains(trimmed,"1>"):
-				var parts []string;
-				if strings.Contains(trimmed,"1>") {
-					parts = strings.SplitN(trimmed,"1>",2)
-				} else {
-					parts = strings.SplitN(trimmed,">",2)
-				}
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-
-				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.Create(outputFile)
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-				}
-				
-				cmd.Stdout = outFile
-				cmd.Stderr = os.Stderr
-				cmd.Run()
-				outFile.Close()
-				continue
-			
-			
-			case strings.Contains(trimmed,">"):
-				var parts []string;
-				parts = strings.SplitN(trimmed,">",2)
-				cmdStr := strings.TrimSpace(parts[0])
-				outputFile := strings.TrimSpace(parts[1])
-
-				cmd := exec.Command("sh","-c",cmdStr)
-				outFile , err := os.Create(outputFile)
-
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
-					continue
-				}
-				defer outFile.Close()
-				cmd.Stdout = outFile
-				cmd.Stderr = os.Stderr
-				cmd.Run()
-				continue
-					
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
-			case strings.HasPrefix(trimmed,"cd"):
-				fullPath := trimmed[len("cd")+1:]
-				if _, err := os.ReadDir(fullPath); err != nil  && fullPath != "~" {
-					fmt.Fprintf(os.Stderr, "cd: %v: No such file or directory\n", fullPath)
-				} else if fullPath == "~" {
-					path := os.Getenv("HOME")
-					os.Chdir(path)
-				}else {
-					os.Chdir(fullPath)
-				}
-				
 			case strings.HasPrefix(trimmed,"pwd"):
 				pwd,err := os.Getwd()
 				if err != nil {
