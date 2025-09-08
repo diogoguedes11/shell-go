@@ -17,7 +17,6 @@ type ShellCompleter struct{}
 func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	lineStr := string(line)
 	userInput := lineStr[:pos]
-	// fmt.Printf("DEBUG: line='%s', pos=%d\n", userInput, pos)
 	builtins := []string{"echo","exit","type","pwd","cd"}
 
 	var completions [][]rune;
@@ -25,7 +24,6 @@ func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 	for _ , builtin := range builtins {
 		if strings.HasPrefix(builtin,userInput) {
 			completions = append(completions, []rune(builtin + " "))
-			return completions, len(builtin)
 		}
 	}
 	if len(completions) > 0 {
@@ -35,6 +33,7 @@ func (c *ShellCompleter) Do(line []rune, pos int) (newLine [][]rune, length int)
 	
 	return nil,0
 }
+
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
