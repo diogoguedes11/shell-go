@@ -24,19 +24,21 @@ func main() {
 		var builtins = []string{"echo","type","pwd","exit","cd"}
 		var entries []os.DirEntry
 		var matches []string
+
+		matches = []string{}
 		for _,path := range paths{
 			 entries , _ = os.ReadDir(path)
 			for _, e := range entries{
 				names = append(names,e.Name())
 			}
 		}
+		matches = append(matches, builtins... )
 		for _, name := range names {
 			if strings.HasPrefix(name,input) {
 				matches = append(matches, name)
 			}
 		}
-		matches = append(matches, builtins... )
-		if len(matches) == 0 {
+		if len(matches) == 5 {
 			fmt.Println("\x07")
 		}
 
