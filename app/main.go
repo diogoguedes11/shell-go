@@ -14,6 +14,7 @@ import (
 var _ = fmt.Fprint
 
 func main() {
+	// testing
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
 	autoCompleter := readline.NewPrefixCompleter(
