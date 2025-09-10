@@ -49,23 +49,23 @@ func main() {
 				parts = strings.SplitN(trimmed,"2>>",2)
 				cmdStr := strings.TrimSpace(parts[0])
 				outputFile := strings.TrimSpace(parts[1])
-
 				cmd := exec.Command("sh","-c",cmdStr)
 				dir := filepath.Dir(outputFile)
 				err := os.MkdirAll(dir, 0755)	
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
 					continue
-				}		
-				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
+				}	
+				outFile , err := os.Create(outputFile)
+
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
 					continue
 				}
-				cmd.Stdout = f
-				cmd.Stderr = os.Stderr
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = outFile
 				cmd.Run()
-				f.Close()
+				outFile.Close()
 				continue
 			case strings.Contains(trimmed,"1>>"):
 				var parts []string;
