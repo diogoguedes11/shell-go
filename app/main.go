@@ -195,7 +195,7 @@ func main() {
 				}
 				err := os.Chdir(dirPath)
 				if err != nil {
-					fmt.Fprintf(os.Stderr,"cd: %v: no such file or directory\n",dirPath)
+					fmt.Fprintf(os.Stderr,"cd: %v: No such file or directory\n",dirPath)
 					continue
 				}
 			case strings.HasPrefix(trimmed,"echo"):
