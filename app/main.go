@@ -42,7 +42,7 @@ func main() {
 				matches = append(matches, name)
 			}
 		}
-		if len(matches) == 5 {
+		if len(matches) == 0 {
 			fmt.Println("\x07")
 		}
 
