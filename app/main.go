@@ -34,7 +34,7 @@ func main() {
 		}
 		for _, b := range builtins {
 			if strings.HasPrefix(b, input) {
-				matches = append(matches, b + " ")
+				matches = append(matches, b )
 			}
 		}
 		for _, name := range names {
