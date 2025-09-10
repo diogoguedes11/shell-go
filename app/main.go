@@ -32,7 +32,11 @@ func main() {
 				names = append(names,e.Name())
 			}
 		}
-		matches = append(matches, builtins... )
+		for _, b := range builtins {
+			if strings.HasPrefix(b, input) {
+				matches = append(matches, b + " ")
+			}
+		}
 		for _, name := range names {
 			if strings.HasPrefix(name,input) {
 				matches = append(matches, name)
