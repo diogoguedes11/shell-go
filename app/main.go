@@ -20,17 +20,24 @@ func main() {
 	found := false
 	autoCompleter := readline.NewPrefixCompleter(
 	readline.PcItemDynamic(func(input string) []string {
-		var builtins = []string{"echo", "exit", "type", "pwd", "cd"}
-		for _, builtin := range builtins {
-
-			if strings.HasPrefix(builtin,input) {
-				return builtins
-			}else {
-				print("\x07")
-				continue
+		var names[]string
+		var entries []os.DirEntry
+		var matches []string
+		for _,path := range paths{
+			 entries , _ = os.ReadDir(path)
+			for _, e := range entries{
+				names = append(names,e.Name())
 			}
 		}
-		return builtins 
+		for _, name := range names {
+			if strings.HasPrefix(name,input) {
+				matches = append(matches, name)
+			}
+		}
+		if len(matches) == 0 {
+			fmt.Println("\x07")
+		}
+		return matches 
 		}),
 	)
 
