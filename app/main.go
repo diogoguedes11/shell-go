@@ -21,6 +21,7 @@ func main() {
 	autoCompleter := readline.NewPrefixCompleter(
 	readline.PcItemDynamic(func(input string) []string {
 		var names[]string
+		var builtins = []string{"echo","type","pwd","exit","cd"}
 		var entries []os.DirEntry
 		var matches []string
 		for _,path := range paths{
@@ -34,9 +35,11 @@ func main() {
 				matches = append(matches, name)
 			}
 		}
+		matches = append(matches, builtins... )
 		if len(matches) == 0 {
 			fmt.Println("\x07")
 		}
+
 		return matches 
 		}),
 	)
