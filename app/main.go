@@ -43,7 +43,7 @@ func main() {
 			}
 		}
 		if len(matches) == 0 {
-			fmt.Println("\x07")
+			fmt.Println("\a")
 		}
 
 		return matches 
