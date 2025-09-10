@@ -195,7 +195,7 @@ func main() {
 				}
 				err := os.Chdir(dirPath)
 				if err != nil {
-					fmt.Fprintf(os.Stderr,"cd: %v\n",err)
+					fmt.Fprintf(os.Stderr,"cd: chdir %v\n",err)
 					continue
 				}
 			case strings.HasPrefix(trimmed,"echo"):
