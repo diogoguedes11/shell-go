@@ -56,7 +56,7 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
 					continue
 				}	
-				outFile , err := os.Create(outputFile)
+				outFile , err := os.OpenFile(outputFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
