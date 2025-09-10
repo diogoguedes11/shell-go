@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -43,6 +44,121 @@ func main() {
 		switch {
 			case trimmed == "exit 0":
 				os.Exit(0)
+			case strings.Contains(trimmed,"2>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,"2>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+				cmd := exec.Command("sh","-c",cmdStr)
+				dir := filepath.Dir(outputFile)
+				err := os.MkdirAll(dir, 0755)	
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
+					continue
+				}	
+				outFile , err := os.Create(outputFile)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = outFile
+				cmd.Run()
+				outFile.Close()
+				continue
+			case strings.Contains(trimmed,"1>"):
+				var parts []string;
+				if strings.Contains(trimmed,"1>") {
+					parts = strings.SplitN(trimmed,"1>",2)
+				} else {
+					parts = strings.SplitN(trimmed,">",2)
+				}
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+				dir := filepath.Dir(outputFile)
+				err := os.MkdirAll(dir, 0755)	
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
+					continue
+				}	
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.Create(outputFile)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				outFile.Close()
+				continue
+			case strings.Contains(trimmed,"1>>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,"1>>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				dir := filepath.Dir(outputFile)
+				err := os.MkdirAll(dir, 0755)	
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
+					continue
+				}	
+				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+					}
+				cmd.Stdout = f
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				f.Close()
+				continue
+			case strings.Contains(trimmed,">>"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,">>",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				dir := filepath.Dir(outputFile)
+				err := os.MkdirAll(dir, 0755)	
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error creating directory: %v\n", err)
+					continue
+				}		
+				f , err := os.OpenFile(outputFile,os.O_APPEND|os.O_WRONLY|os.O_CREATE,0644)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				cmd.Stdout = f
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				f.Close()
+				continue
+			case strings.Contains(trimmed,">"):
+				var parts []string;
+				parts = strings.SplitN(trimmed,">",2)
+				cmdStr := strings.TrimSpace(parts[0])
+				outputFile := strings.TrimSpace(parts[1])
+
+				cmd := exec.Command("sh","-c",cmdStr)
+				outFile , err := os.Create(outputFile)
+
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error opening file: %v\n", err)
+					continue
+				}
+				defer outFile.Close()
+				cmd.Stdout = outFile
+				cmd.Stderr = os.Stderr
+				cmd.Run()
+				continue
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
 			case strings.HasPrefix(trimmed,"pwd"):
