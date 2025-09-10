@@ -183,6 +183,21 @@ func main() {
 				cmd.Stderr = os.Stderr
 				cmd.Run()
 				continue
+			case strings.HasPrefix(trimmed,"cd"):
+				dirPath := strings.TrimSpace(trimmed[len("cd"):])
+				if dirPath == "" || dirPath == "~" {
+					homeDir, err := os.UserHomeDir()
+					if err != nil {
+						fmt.Printf("Error while using the command cd: %v",err)
+						continue
+					}
+					dirPath = homeDir
+				}
+				err := os.Chdir(dirPath)
+				if err != nil {
+					fmt.Fprintf(os.Stderr,"cd: %v\n",err)
+					continue
+				}
 			case strings.HasPrefix(trimmed,"echo"):
 				fmt.Println(trimmed[len("echo")+1:])
 			case strings.HasPrefix(trimmed,"pwd"):
