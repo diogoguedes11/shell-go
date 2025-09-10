@@ -16,12 +16,24 @@ var _ = fmt.Fprint
 
 func main() {
 	// testing
-	paths := strings.Split(os.Getenv("PATH"), ":")
+	paths := strings.Split(os.Getenv("PATH"),":")
 	found := false
 	autoCompleter := readline.NewPrefixCompleter(
-		readline.PcItem("exit"),
-		readline.PcItem("echo"),
+	readline.PcItemDynamic(func(input string) []string {
+		var builtins = []string{"echo", "exit", "type", "pwd", "cd"}
+		for _, builtin := range builtins {
+
+			if strings.HasPrefix(builtin,input) {
+				return builtins
+			}else {
+				print("\x07")
+				continue
+			}
+		}
+		return builtins 
+		}),
 	)
+
 	config := &readline.Config{
 			Prompt: "$ ",
 			AutoComplete: autoCompleter,
