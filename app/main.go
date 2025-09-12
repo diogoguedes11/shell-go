@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -14,11 +15,19 @@ import (
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
 var (
-	lastInput string
 	tabCount int
+	matches []string
+	
 )
+func contains(slice []string, item string) bool {
+    for _, s := range slice {
+        if s == item {
+            return true
+        }
+    }
+    return false
+}
 func main() {
-	// testing
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
 	autoCompleter := readline.NewPrefixCompleter(
@@ -26,42 +35,49 @@ func main() {
 			var names []string
 			var builtins = []string{"echo", "type", "pwd", "exit", "cd"}
 			var entries []os.DirEntry
-			var matches []string
 			matches = []string{}
-
-			if lastInput != input {
-				tabCount = 0
-				lastInput = input
-			}
 			
+			tabCount++
 			for _, path := range paths {
 				entries, _ = os.ReadDir(path)
 				for _, e := range entries {
 					names = append(names, e.Name())
-					tabCount++
 				}
 			}
 			for _, b := range builtins {
-				if strings.HasPrefix(b, input) {
+				if strings.HasPrefix(b, input) && !contains(matches,b) {
 					matches = append(matches, b)
-					tabCount++
 				}
 			}
-			for _, name := range names {
-				if strings.HasPrefix(name, input) {
+			for _, name := range names{
+				if strings.HasPrefix(name, input) && !contains(matches,name) {
 					matches = append(matches, name)
-					tabCount++
 				}
 			}
 			if len(matches) == 0 {
-				fmt.Println("\a")
+				fmt.Fprint(os.Stdout, "\a")
+				return nil
 			}
+			if len(matches) == 1 {
+				return matches
+			}
+			// Multiple matches
 			if tabCount == 1 {
-				fmt.Println("\a")
+				fmt.Fprint(os.Stdout, "\a")
+				return nil
 			}
+			sort.Strings(matches)
 
-			return matches
-		}),
+			fmt.Fprint(os.Stdout, "\n")
+			for i, m := range matches {
+				if i > 0 {
+					fmt.Fprint(os.Stdout, "  ")
+				}
+				fmt.Fprint(os.Stdout, m)
+			}
+            	fmt.Fprint(os.Stdout, "\n$ "+input)
+            return nil
+        }),
 	)
 
 	config := &readline.Config{
@@ -74,8 +90,8 @@ func main() {
 		os.Exit(1)
 	}
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
-
+		// fmt.Fprint(os.Stdout, "$ ")
+		
 		command, err := rl.Readline()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
