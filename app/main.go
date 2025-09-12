@@ -61,28 +61,30 @@ func main() {
 			if len(matches) == 1 {
 				return matches
 			}
+			
 			// Multiple matches
-			if tabCount == 1 {
-				fmt.Fprint(os.Stdout, "\a")
-				return nil
-			}
+			// if tabCount == 1 {
+			// 	fmt.Fprint(os.Stdout, "\a")
+			// 	return nil
+			// }
 			sort.Strings(matches)
 
-			fmt.Fprint(os.Stdout, "\n")
-			for i, m := range matches {
-				if i > 0 {
-					fmt.Fprint(os.Stdout, "  ")
-				}
-				fmt.Fprint(os.Stdout, m)
-			}
-            	fmt.Fprint(os.Stdout, "\n$ "+input)
-            return nil
+			// fmt.Fprint(os.Stdout, "\n")
+			// for i, m := range matches {
+			// 	if i > 0 {
+			// 		fmt.Fprint(os.Stdout, "  ")
+			// 	}
+			// 	fmt.Fprint(os.Stdout, m)
+			// }
+            	// fmt.Fprint(os.Stdout, "\n$ "+input)
+            return []string{matches[0]}
         }),
 	)
 
 	config := &readline.Config{
 		Prompt:       "$ ",
 		AutoComplete: autoCompleter,
+		
 	}
 	rl, err := readline.NewEx(config)
 	if err != nil {
