@@ -24,8 +24,13 @@ func main() {
 			var builtins = []string{"echo", "type", "pwd", "exit", "cd"}
 			var entries []os.DirEntry
 			var matches []string
-
+			tabCount := 0
+			tabCount++
 			matches = []string{}
+
+			if tabCount == 1 {
+				fmt.Println("\a")
+			} 
 			for _, path := range paths {
 				entries, _ = os.ReadDir(path)
 				for _, e := range entries {
@@ -34,13 +39,11 @@ func main() {
 			}
 			for _, b := range builtins {
 				if strings.HasPrefix(b, input) {
-					fmt.Println("\a")
 					matches = append(matches, b)
 				}
 			}
 			for _, name := range names {
 				if strings.HasPrefix(name, input) {
-					fmt.Println("\a")
 					matches = append(matches, name)
 				}
 			}
