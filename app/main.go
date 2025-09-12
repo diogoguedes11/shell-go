@@ -34,11 +34,13 @@ func main() {
 			}
 			for _, b := range builtins {
 				if strings.HasPrefix(b, input) {
+					fmt.Println("\a")
 					matches = append(matches, b)
 				}
 			}
 			for _, name := range names {
 				if strings.HasPrefix(name, input) {
+					fmt.Println("\a")
 					matches = append(matches, name)
 				}
 			}
