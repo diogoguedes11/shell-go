@@ -13,7 +13,10 @@ import (
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
-
+var (
+	lastInput string
+	tabCount int
+)
 func main() {
 	// testing
 	paths := strings.Split(os.Getenv("PATH"), ":")
@@ -25,10 +28,12 @@ func main() {
 			var entries []os.DirEntry
 			var matches []string
 			matches = []string{}
-			tabCount := 0
-			
 
-			 
+			if lastInput != input {
+				tabCount = 0
+				lastInput = input
+			}
+			
 			for _, path := range paths {
 				entries, _ = os.ReadDir(path)
 				for _, e := range entries {
