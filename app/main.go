@@ -51,7 +51,7 @@ func main() {
 			if len(matches) == 0 {
 				fmt.Println("\a")
 			}
-			if tabCount == 2 {
+			if tabCount == 1 {
 				fmt.Println("\a")
 			}
 
