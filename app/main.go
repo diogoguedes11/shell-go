@@ -27,64 +27,95 @@ func contains(slice []string, item string) bool {
     }
     return false
 }
+type ShellCompleter struct{}
+
+func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
+    input := string(line[:pos])
+    matches := findExecutables(input)
+    if len(matches) == 0 {
+		print("\a")
+        return nil, 0
+    }
+
+    if len(matches) == 1 {
+        completion := matches[0][len(input):]
+	   if input + completion == matches[0] {
+        	return [][]rune{[]rune(completion + " ")}, len(input)
+	   }
+    }
+	// if len(matches) > 1 {
+	// 	fmt.Printf("\n")
+	// 	for _, match := range matches {
+	// 		fmt.Printf("%s  ", match)
+	// 	}
+	// 	fmt.Printf("\n$ %s", string(line))
+	// }
+	print("\a")
+    commonPrefix := findCommonPrefix(matches)
+    if len(commonPrefix) > len(input) {
+        completion := commonPrefix[len(input):]
+        return [][]rune{[]rune(completion)}, len(input)
+    }
+    return nil, 0
+}
+
+func findExecutables(prefix string) []string {
+    var matches []string
+    paths := strings.Split(os.Getenv("PATH"), ":")
+    
+    for _, path := range paths {
+        entries, err := os.ReadDir(path)
+        if err != nil {
+            continue
+        }
+        for _, e := range entries {
+            name := e.Name()
+            if strings.HasPrefix(name, prefix) {
+                matches = append(matches, name)
+            }
+        }
+    }
+    sort.Strings(matches)
+    return matches
+}
+// findCommonPrefix finds the longest common prefix of all strings in the slice
+func findCommonPrefix(strs []string) string {
+    if len(strs) == 0 {
+        return ""
+    }
+    if len(strs) == 1 {
+        return strs[0]
+    }
+    
+    // Find the shortest string
+    minLen := len(strs[0])
+    for _, s := range strs {
+        if len(s) < minLen {
+            minLen = len(s)
+        }
+    }
+    
+    // Find the common prefix
+    for i := 0; i < minLen; i++ {
+        char := strs[0][i]
+        for _, s := range strs {
+            if s[i] != char {
+                return strs[0][:i]
+            }
+        }
+    }
+    return strs[0][:minLen]
+}
+
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
-	autoCompleter := readline.NewPrefixCompleter(
-		readline.PcItemDynamic(func(input string) []string {
-			var names []string
-			var builtins = []string{"echo", "type", "pwd", "exit", "cd"}
-			var entries []os.DirEntry
-			matches = []string{}
-			
-			tabCount++
-			for _, path := range paths {
-				entries, _ = os.ReadDir(path)
-				for _, e := range entries {
-					names = append(names, e.Name())
-				}
-			}
-			for _, b := range builtins {
-				if strings.HasPrefix(b, input) && !contains(matches,b) {
-					matches = append(matches, b)
-				}
-			}
-			for _, name := range names{
-				if strings.HasPrefix(name, input) && !contains(matches,name) {
-					matches = append(matches, name)
-				}
-			}
-			if len(matches) == 0 {
-				fmt.Fprint(os.Stdout, "\a")
-				return nil
-			}
-			if len(matches) == 1 {
-				return matches
-			}
-			
-			// Multiple matches
-			// if tabCount == 1 {
-			// 	fmt.Fprint(os.Stdout, "\a")
-			// 	return nil
-			// }
-			sort.Strings(matches)
-
-			// fmt.Fprint(os.Stdout, "\n")
-			// for i, m := range matches {
-			// 	if i > 0 {
-			// 		fmt.Fprint(os.Stdout, "  ")
-			// 	}
-			// 	fmt.Fprint(os.Stdout, m)
-			// }
-            	// fmt.Fprint(os.Stdout, "\n$ "+input)
-            return []string{matches[0]}
-        }),
-	)
-
 	config := &readline.Config{
 		Prompt:       "$ ",
-		AutoComplete: autoCompleter,
-		
+		AutoComplete: &ShellCompleter{},
+		DisableAutoSaveHistory: false,
+		EOFPrompt: "exit",
+		InterruptPrompt: "^C",
 	}
 	rl, err := readline.NewEx(config)
 	if err != nil {
