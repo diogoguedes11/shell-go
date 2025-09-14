@@ -19,6 +19,41 @@ var (
 	matches []string
 	
 )
+func findLongestCommonPrefix(input string,matches []string) string {
+	if len(matches) == 0{
+		return ""
+	}
+	minLen := -1
+	for _, m := range matches {
+		fmt.Printf("match: %s, len: %d\n", m, len(m))
+		if minLen == -1 || len(m) < minLen {
+			minLen = len(m)
+		}
+	}
+	fmt.Printf("minLen: %d\n", minLen)
+	if minLen == -1 {
+		return ""
+	}
+	for i := 0; i < minLen; i++ {
+    		ch := matches[0][i]
+		for _, m := range matches {
+			if m[i] != ch {
+				fmt.Printf("input: %q, len(input): %d, i: %d, minLen: %d\n", input, len(input), i, minLen)
+				if i < len(input) {
+					print("\a")
+					return ""
+				}
+					print("\a")
+					return matches[0][len(input):i]	
+
+			}
+		}
+	}
+	if minLen < len(input) {
+		return ""
+	}
+	return matches[0][len(input):minLen]
+}
 func contains(slice []string, item string) bool {
     for _, s := range slice {
         if s == item {
@@ -30,33 +65,30 @@ func contains(slice []string, item string) bool {
 type ShellCompleter struct{}
 
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
-    input := string(line[:pos])
-    matches := findExecutables(input)
-    if len(matches) == 0 {
-		print("\a")
-        return nil, 0
-    }
+	input := string(line[:pos])
+	matches := findExecutables(input)
+	if len(matches) == 0 {
+			print("\a")
+		return nil, 0
+	}
 
-    if len(matches) == 1 {
-        completion := matches[0][len(input):]
-	   if input + completion == matches[0] {
-        	return [][]rune{[]rune(completion + " ")}, len(input)
-	   }
-    }
-	// if len(matches) > 1 {
-	// 	fmt.Printf("\n")
-	// 	for _, match := range matches {
-	// 		fmt.Printf("%s  ", match)
-	// 	}
-	// 	fmt.Printf("\n$ %s", string(line))
-	// }
-	print("\a")
-    commonPrefix := findCommonPrefix(matches)
-    if len(commonPrefix) > len(input) {
-        completion := commonPrefix[len(input):]
-        return [][]rune{[]rune(completion)}, len(input)
-    }
-    return nil, 0
+	if len(matches) == 1 {
+		completion := matches[0][len(input):]
+		if input + completion == matches[0] {
+			return [][]rune{[]rune(completion + " ")}, len(input)
+		}
+	}
+	if len(matches) > 1 {
+		// fmt.Printf("\n")
+		// for _, match := range matches {
+		// 	fmt.Printf("%s  ", match)
+		// }
+		// fmt.Printf("\n$ %s", string(line))
+		commonPrefix := findLongestCommonPrefix(input,matches)
+		completion := commonPrefix[len(input):]
+		return [][]rune{[]rune(completion)}, len(input)
+	}
+    	return nil, 0
 }
 
 func findExecutables(prefix string) []string {
@@ -70,41 +102,13 @@ func findExecutables(prefix string) []string {
         }
         for _, e := range entries {
             name := e.Name()
-            if strings.HasPrefix(name, prefix) {
+            if strings.HasPrefix(name, prefix) && !contains(matches,name) {
                 matches = append(matches, name)
             }
         }
     }
     sort.Strings(matches)
     return matches
-}
-// findCommonPrefix finds the longest common prefix of all strings in the slice
-func findCommonPrefix(strs []string) string {
-    if len(strs) == 0 {
-        return ""
-    }
-    if len(strs) == 1 {
-        return strs[0]
-    }
-    
-    // Find the shortest string
-    minLen := len(strs[0])
-    for _, s := range strs {
-        if len(s) < minLen {
-            minLen = len(s)
-        }
-    }
-    
-    // Find the common prefix
-    for i := 0; i < minLen; i++ {
-        char := strs[0][i]
-        for _, s := range strs {
-            if s[i] != char {
-                return strs[0][:i]
-            }
-        }
-    }
-    return strs[0][:minLen]
 }
 
 func main() {
