@@ -299,7 +299,12 @@ func main() {
 				continue
 			}
 		case strings.HasPrefix(trimmed, "echo"):
-			fmt.Println(trimmed[len("echo")+1:])
+			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
+			if len(arg) >= 2 && ((strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) || (strings.HasPrefix(arg, `"` ) && strings.HasSuffix(arg, `"`))) {
+				fmt.Fprintln(os.Stdout,arg[1 :len(arg)-1])
+			} else {
+				fmt.Fprintf(os.Stdout,"%v",arg)
+			}
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
@@ -337,6 +342,9 @@ func main() {
 			found = false
 			for _, path := range paths {
 				fullPath := path + "/" + programName
+				// if ((strings.HasPrefix(path, "'") && strings.HasSuffix(path, "'")) || (strings.HasPrefix(path, `"` ) && strings.HasSuffix(path, `"`))) {
+				// 	fmt.Fprintln(os.Stdout,fullPath[1:len(fullPath)-1])
+				// } 
 				if fileInfo, err := os.Stat(fullPath); err == nil {
 					if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
 						cmd := exec.Command(programName, arguments...)
