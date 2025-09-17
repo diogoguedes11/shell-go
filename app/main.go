@@ -33,7 +33,6 @@ func findLongestCommonPrefix(input string,matches []string) string {
     		ch := matches[0][i]
 		for _, m := range matches {
 			if m[i] != ch {
-				fmt.Printf("input: %q, len(input): %d, i: %d, minLen: %d\n", input, len(input), i, minLen)
 				if i < len(input) {
 					print("\a")
 					return ""
@@ -42,7 +41,7 @@ func findLongestCommonPrefix(input string,matches []string) string {
 					fmt.Printf("Returning: %q\n", matches[0][len(input):i])
 					return matches[0][len(input):i]	
 
-			}
+			} 
 		}
 	}
 	if minLen < len(input) {
