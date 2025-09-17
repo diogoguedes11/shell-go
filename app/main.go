@@ -1,7 +1,7 @@
 // This is a simple shell implementation in Go. It supports basic shell commands
 // such as `cd`, `echo`, `pwd`, `type`, and `exit`. It also provides features like
-// command auto-completion, redirection of output (e.g., `>`, `>>`, `1>`, `2>`), 
-// and execution of external programs. The shell uses the `readline` library for 
+// command auto-completion, redirection of output (e.g., `>`, `>>`, `1>`, `2>`),
+// and execution of external programs. The shell uses the `readline` library for
 // interactive input handling and provides a user-friendly prompt.
 
 package main
@@ -138,25 +138,7 @@ that start with the given prefix. It avoids duplicates and skips directories tha
 //
 // @param prefix string - The prefix to match against executable filenames.
 // @returns []string - A sorted slice containing the names of matching executables.
-func findExecutables(prefix string) []string {
-	var matches []string
-	paths := strings.Split(os.Getenv("PATH"), ":")
-	
-	for _, path := range paths {
-		entries, err := os.ReadDir(path)
-		if err != nil {
-			continue
-		}
-		for _, e := range entries {
-			name := e.Name()
-			if strings.HasPrefix(name, prefix) && !contains(matches, name) {
-				matches = append(matches, name)
-			}
-		}
-	}
-	sort.Strings(matches)
-	return matches
-}
+
 
 // main is the entry point of the shell application. It initializes the readline
 // library, sets up the shell prompt, and handles user input to execute commands.
@@ -356,7 +338,7 @@ func main() {
 				args := strings.Fields(arg)
 				// fmt.Fprintln(os.Stdout, args)
 				for _, f := range args {
-					fmt.Fprintln(os.Stdout,string(f[]))
+					fmt.Fprintln(os.Stdout,string(f))
 				}
 			}
 		case strings.HasPrefix(trimmed,"exit"):
@@ -419,4 +401,23 @@ func main() {
 			}
 		}
 	}
+}
+func findExecutables(prefix string) []string {
+	var matches []string
+	paths := strings.Split(os.Getenv("PATH"), ":")
+	
+	for _, path := range paths {
+		entries, err := os.ReadDir(path)
+		if err != nil {
+			continue
+		}
+		for _, e := range entries {
+			name := e.Name()
+			if strings.HasPrefix(name, prefix) && !contains(matches, name) {
+				matches = append(matches, name)
+			}
+		}
+	}
+	sort.Strings(matches)
+	return matches
 }
