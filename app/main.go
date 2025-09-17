@@ -37,14 +37,13 @@ func findLongestCommonPrefix(input string,matches []string) string {
 				}
 					print("\a")
 					return matches[0][:i]	
-
 			} 
 		}
 	}
 	if minLen < len(input) {
 		return ""
 	}
-	return matches[0][len(input):minLen]
+	return matches[0][:minLen]
 }
 func contains(slice []string, item string) bool {
     for _, s := range slice {
