@@ -303,7 +303,7 @@ func main() {
 			if len(arg) >= 2 && ((strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) || (strings.HasPrefix(arg, `"` ) && strings.HasSuffix(arg, `"`))) {
 				fmt.Fprintln(os.Stdout,arg[1 :len(arg)-1])
 			} else {
-				fmt.Fprintf(os.Stdout,"%v",arg)
+				fmt.Fprintln(os.Stdout,arg)
 			}
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
