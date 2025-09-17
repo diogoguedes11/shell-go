@@ -14,11 +14,6 @@ import (
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
-var (
-	tabCount int
-	matches []string
-	
-)
 func findLongestCommonPrefix(input string,matches []string) string {
 	if len(matches) == 0{
 		return ""
@@ -44,6 +39,7 @@ func findLongestCommonPrefix(input string,matches []string) string {
 					return ""
 				}
 					print("\a")
+					fmt.Printf("Returning: %q\n", matches[0][len(input):i])
 					return matches[0][len(input):i]	
 
 			}
@@ -79,15 +75,24 @@ func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 		}
 	}
 	if len(matches) > 1 {
-		// fmt.Printf("\n")
-		// for _, match := range matches {
-		// 	fmt.Printf("%s  ", match)
-		// }
-		// fmt.Printf("\n$ %s", string(line))
-		commonPrefix := findLongestCommonPrefix(input,matches)
-		completion := commonPrefix[len(input):]
-		return [][]rune{[]rune(completion)}, len(input)
-	}
+        commonPrefix := findLongestCommonPrefix(input, matches)
+        // only take the tail if the common prefix is longer than the input
+        if len(commonPrefix) > len(input) {
+            completion := commonPrefix[len(input):]
+            return [][]rune{[]rune(completion)}, len(input)
+        }
+        // otherwise show matches and do not attempt to slice
+        fmt.Fprint(os.Stdout, "\n")
+        for i, m := range matches {
+            if i > 0 {
+                fmt.Fprint(os.Stdout, "  ")
+            }
+            fmt.Fprint(os.Stdout, m)
+        }
+        fmt.Fprintf(os.Stdout, "\n$ %s", input)
+        return nil, 0
+    }
+    // ...
     	return nil, 0
 }
 
