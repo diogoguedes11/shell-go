@@ -43,6 +43,7 @@ func findLongestCommonPrefix(input string,matches []string) string {
 	if minLen < len(input) {
 		return ""
 	}
+	// If we reach here, it means we found a common prefix
 	return matches[0][:minLen]
 }
 func contains(slice []string, item string) bool {
