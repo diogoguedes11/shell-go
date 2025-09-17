@@ -38,7 +38,7 @@ func findLongestCommonPrefix(input string,matches []string) string {
 					return ""
 				}
 					print("\a")
-					fmt.Printf("Returning: %q\n", matches[0][len(input):i])
+					// fmt.Printf("Returning: %q\n", matches[0][len(input):i])
 					return matches[0][len(input):i]	
 
 			} 
@@ -81,14 +81,14 @@ func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
             return [][]rune{[]rune(completion)}, len(input)
         }
         // otherwise show matches and do not attempt to slice
-        fmt.Fprint(os.Stdout, "\n")
-        for i, m := range matches {
-            if i > 0 {
-                fmt.Fprint(os.Stdout, "  ")
-            }
-            fmt.Fprint(os.Stdout, m)
-        }
-        fmt.Fprintf(os.Stdout, "\n$ %s", input)
+     //    fmt.Fprint(os.Stdout, "\n")
+     //    for i, m := range matches {
+     //        if i > 0 {
+     //            fmt.Fprint(os.Stdout, "  ")
+     //        }
+     //        fmt.Fprint(os.Stdout, m)
+     //    }
+     //    fmt.Fprintf(os.Stdout, "\n$ %s", input)
         return nil, 0
     }
     // ...
