@@ -24,7 +24,6 @@ func findLongestCommonPrefix(input string,matches []string) string {
 			minLen = len(m)
 		}
 	}
-	fmt.Printf("minLen: %d\n", minLen)
 	if minLen == -1 {
 		return ""
 	}
