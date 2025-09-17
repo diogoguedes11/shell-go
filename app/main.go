@@ -77,7 +77,7 @@ func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
             completion := commonPrefix[len(input):]
             return [][]rune{[]rune(completion)}, len(input)
         }
-        fmt.Fprint(os.Stdout, "\n")
+     //    fmt.Fprint(os.Stdout, "\n")
      //    for i, m := range matches {
      //        if i > 0 {
      //            fmt.Fprint(os.Stdout, "  ")
