@@ -1,9 +1,3 @@
-// This is a simple shell implementation in Go. It supports basic shell commands
-// such as `cd`, `echo`, `pwd`, `type`, and `exit`. It also provides features like
-// command auto-completion, redirection of output (e.g., `>`, `>>`, `1>`, `2>`),
-// and execution of external programs. The shell uses the `readline` library for
-// interactive input handling and provides a user-friendly prompt.
-
 package main
 
 import (
@@ -20,15 +14,7 @@ import (
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
-
-// findLongestCommonPrefix finds the longest common prefix among a list of strings
-// that matches the given input. If no common prefix exists, it returns an empty string.
-// It also handles edge cases where the input is longer than the common prefix.
-//
-// @param input string - The input string to match against.
-// @param matches []string - A list of strings to find the common prefix from.
-// @returns string - The longest common prefix or an empty string.
-func findLongestCommonPrefix(input string, matches []string) string {
+func findLongestCommonPrefix(input string,matches []string) string {
 	if len(matches) == 0{
 		return ""
 	}
@@ -60,12 +46,6 @@ func findLongestCommonPrefix(input string, matches []string) string {
 	// If we reach here, it means we found a common prefix
 	return matches[0][:minLen]
 }
-
-// contains checks if a given string exists in a slice of strings.
-//
-// @param slice []string - The slice of strings to search in.
-// @param item string - The string to search for.
-// @returns bool - True if the string exists in the slice, false otherwise.
 func contains(slice []string, item string) bool {
     for _, s := range slice {
         if s == item {
@@ -74,17 +54,8 @@ func contains(slice []string, item string) bool {
     }
     return false
 }
-
-// ShellCompleter is a struct that implements the readline.AutoCompleter interface.
-// It provides auto-completion for shell commands and built-in functions.
 type ShellCompleter struct{}
 
-// Do provides auto-completion suggestions for the current input line.
-// It matches the input against built-in commands and executables in the system's PATH.
-//
-// @param line []rune - The current input line as a slice of runes.
-// @param pos int - The current cursor position in the input line.
-// @returns [][]rune, int - A slice of rune slices representing suggestions and the position offset.
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
 	matches := findExecutables(input)
@@ -125,24 +96,26 @@ func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
     	return nil, 0
 }
 
-/**
-findExecutables returns a sorted list of executable file names found in the system's PATH
-that start with the given prefix. It avoids duplicates and skips directories that cannot be read.
+func findExecutables(prefix string) []string {
+    var matches []string
+    paths := strings.Split(os.Getenv("PATH"), ":")
+    
+    for _, path := range paths {
+        entries, err := os.ReadDir(path)
+        if err != nil {
+            continue
+        }
+        for _, e := range entries {
+            name := e.Name()
+            if strings.HasPrefix(name, prefix) && !contains(matches,name) {
+                matches = append(matches, name)
+            }
+        }
+    }
+    sort.Strings(matches)
+    return matches
+}
 
-@param prefix string - The prefix to match against executable filenames.
-@returns []string - A sorted slice containing the names of matching executables.
-*/
-
-// findExecutables searches for executable files in the system's PATH that start with
-// the given prefix. It avoids duplicates and skips directories that cannot be read.
-//
-// @param prefix string - The prefix to match against executable filenames.
-// @returns []string - A sorted slice containing the names of matching executables.
-
-
-// main is the entry point of the shell application. It initializes the readline
-// library, sets up the shell prompt, and handles user input to execute commands.
-// It supports built-in commands, redirection, and external program execution.
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
@@ -160,6 +133,7 @@ func main() {
 	}
 	for {
 		// fmt.Fprint(os.Stdout, "$ ")
+		
 		command, err := rl.Readline()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
@@ -326,20 +300,13 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
-			// if strings.Contains(arg[1 :len(arg)-1],"'") {
-			// 	args := arg[1 :len(arg)-1]
-			// 	for _, f := range strings.Fields(args) {
-			// 		fmt.Fprintln(os.Stdout,  f)
-			// 	}
-			// }
 			if len(arg) >= 2 && ((strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) || (strings.HasPrefix(arg, `"` ) && strings.HasSuffix(arg, `"`))) {
 				fmt.Fprintln(os.Stdout,arg[1 :len(arg)-1])
-			} else {
-				args := strings.Fields(arg)
-				// fmt.Fprintln(os.Stdout, args)
-				for _, f := range args {
-					fmt.Fprintln(os.Stdout,string(f))
-				}
+			} 
+			if strings.Contains(arg[1 :len(arg)-1],"'") {
+				fmt.Println("yes")
+			}else {
+				fmt.Fprintln(os.Stdout,  strings.Join(strings.Fields(arg), " "))
 			}
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
@@ -401,23 +368,4 @@ func main() {
 			}
 		}
 	}
-}
-func findExecutables(prefix string) []string {
-	var matches []string
-	paths := strings.Split(os.Getenv("PATH"), ":")
-	
-	for _, path := range paths {
-		entries, err := os.ReadDir(path)
-		if err != nil {
-			continue
-		}
-		for _, e := range entries {
-			name := e.Name()
-			if strings.HasPrefix(name, prefix) && !contains(matches, name) {
-				matches = append(matches, name)
-			}
-		}
-	}
-	sort.Strings(matches)
-	return matches
 }
