@@ -59,11 +59,17 @@ type ShellCompleter struct{}
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
 	matches := findExecutables(input)
+	builtins := []string{"cd", "echo", "exit", "pwd", "type"}
+	for _, b := range builtins {
+		if strings.HasPrefix(b, input) && !contains(matches,b) {
+			matches = append(matches, b)
+		}
+	}
+	sort.Strings(matches)
 	if len(matches) == 0 {
 			print("\a")
 		return nil, 0
 	}
-
 	if len(matches) == 1 {
 		completion := matches[0][len(input):]
 		if input + completion == matches[0] {
@@ -294,6 +300,8 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "echo"):
 			fmt.Println(trimmed[len("echo")+1:])
+		case strings.HasPrefix(trimmed,"exit"):
+			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
 			pwd, err := os.Getwd()
 			if err != nil {
