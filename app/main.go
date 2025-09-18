@@ -389,44 +389,37 @@ func main() {
 			parts := parseArgs(trimmed)
 			programName := parts[0]
 			arguments := parts[1:]
-
-			for _,arg := range  arguments {
-				fmt.Println(arg)
-			}
 			found = false
-			for _, path := range paths {
-				fullPath := path + "/" + programName
 
-				if programName == "cat" {
-					for _, arg := range arguments {
-						data, err := os.ReadFile(arg)
-						if err != nil {
-							fmt.Fprintf(os.Stderr, "cat: %s: %v\n", arg, err)
-							continue
-						}
-						fmt.Fprint(os.Stdout, string(data))
+			// Special handling for "cat"
+			if programName == "cat" {
+				for _, arg := range arguments {
+					data, err := os.ReadFile(arg)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "cat: %s: %v\n", arg, err)
+						continue
 					}
-					continue
-					}
-				if fileInfo, err := os.Stat(fullPath); err == nil {
-					if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
+					fmt.Fprint(os.Stdout, string(data))
+				}
+				found = true
+			} else {
+				for _, path := range paths {
+					fullPath := path + "/" + programName
+					if fileInfo, err := os.Stat(fullPath); err == nil {
+						if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
 							cmd := exec.Command(programName, arguments...)
-							cmd.Stdout = os.Stdout // allows me to get the output in my shell
-							cmd.Stderr = os.Stderr // allows me to get the error output in my shell
+							cmd.Stdout = os.Stdout
+							cmd.Stderr = os.Stderr
 							err := cmd.Run()
 							if err != nil {
 								log.Fatalf("Error executing the program: %s %v", programName, arguments)
-								return
 							}
-							if err != nil {
-							log.Fatalf("Error executing the program: %s %v", programName, arguments)
-							return
-						}
 							found = true
 							break
 						}
 					}
 				}
+			}
 			if !found {
 				fmt.Println(programName + ": not found")
 			}
