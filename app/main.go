@@ -353,7 +353,7 @@ func main() {
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			
-			if strings.HasPrefix(arg, "'")  {
+			if strings.HasPrefix(arg, "'")  || strings.HasPrefix(arg, `"`) {
 				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:]))
 			
 			} else {
