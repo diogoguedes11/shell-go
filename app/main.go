@@ -316,10 +316,10 @@ func main() {
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			
 			if strings.HasPrefix(arg, "'")  {
-				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:len(arg)]))
+				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:]))
 			
 			} else {
-				fmt.Fprintln(os.Stdout, arg)
+				fmt.Fprintln(os.Stdout, strings.Join(strings.Fields(arg), " "))
 			}
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
