@@ -55,18 +55,7 @@ func contains(slice []string, item string) bool {
     return false
 }
 
-func quotedStrings(s string) string {
-	if len(s) >= 2 && ((strings.HasPrefix(s, "'") && strings.HasSuffix(s, "'")) || (strings.HasPrefix(s, `"` ) && strings.HasSuffix(s, `"`))) {
-		for _, c := range s {
-			fmt.Fprintf(os.Stdout, "%v\n", string(c))
-			if strings.Contains(string(c), "'") {
-				s = strings.ReplaceAll(s, "'", "")
-			}
-		}
-	} 
-	s = strings.ReplaceAll(s, `'`, "")
-	return s
-}
+
 func parseArgs(input string) []string {
     var args []string
     var current string
@@ -350,7 +339,7 @@ func main() {
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			
 			if strings.HasPrefix(arg, "'")  {
-				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:]))
+				fmt.Fprintln(os.Stdout, parseArgs(arg[1:]))
 			
 			} else {
 				fmt.Fprintln(os.Stdout, strings.Join(strings.Fields(arg), " "))
