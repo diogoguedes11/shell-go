@@ -318,10 +318,9 @@ func main() {
 			if strings.HasPrefix(arg, "'")  {
 				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:len(arg)]))
 			
+			} else {
+				fmt.Fprintln(os.Stdout, arg)
 			}
-				// } else {
-			// 	fmt.Fprintln(os.Stdout, arg)
-			// }
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
