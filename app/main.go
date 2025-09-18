@@ -54,6 +54,20 @@ func contains(slice []string, item string) bool {
     }
     return false
 }
+
+func quotedStrings(s string) string {
+	if len(s) >= 2 && ((strings.HasPrefix(s, "'") && strings.HasSuffix(s, "'")) || (strings.HasPrefix(s, `"` ) && strings.HasSuffix(s, `"`))) {
+		for _, c := range s {
+			fmt.Fprintf(os.Stdout, "%v\n", string(c))
+			if strings.Contains(string(c), "'") {
+				s = strings.ReplaceAll(s, "'", "")
+			}
+		}
+	} 
+	s = strings.ReplaceAll(s, `'`, "")
+	return s
+}
+
 type ShellCompleter struct{}
 
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
@@ -300,11 +314,14 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
-			if len(arg) >= 2 && ((strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) || (strings.HasPrefix(arg, `"` ) && strings.HasSuffix(arg, `"`))) {
-				fmt.Fprintln(os.Stdout,arg[1 :len(arg)-1])
-			} else {
-				fmt.Fprintln(os.Stdout,  strings.Join(strings.Fields(arg), " "))
+			
+			if strings.HasPrefix(arg, "'")  {
+				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:len(arg)]))
+			
 			}
+				// } else {
+			// 	fmt.Fprintln(os.Stdout, arg)
+			// }
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
