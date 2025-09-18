@@ -353,11 +353,10 @@ func main() {
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			
-			if (strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) ||
-			   (strings.HasPrefix(arg, `"`) && strings.HasSuffix(arg, `"`)) {
-				fmt.Fprintln(os.Stdout, arg[1:len(arg)-1])
+			if strings.HasPrefix(arg, "'")  || strings.HasPrefix(arg, `"`) {
+				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:]))
+			
 			} else {
-				// Collapse multiple spaces for non-quoted
 				fmt.Fprintln(os.Stdout, strings.Join(strings.Fields(arg), " "))
 			}
 		case strings.HasPrefix(trimmed,"exit"):
