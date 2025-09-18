@@ -67,6 +67,40 @@ func quotedStrings(s string) string {
 	s = strings.ReplaceAll(s, `'`, "")
 	return s
 }
+func parseArgs(input string) []string {
+    var args []string
+    var current string
+    inQuotes := false
+    quoteChar := byte(0)
+    for i := 0; i < len(input); i++ {
+        c := input[i]
+        if inQuotes {
+            if c == quoteChar {
+                inQuotes = false
+                args = append(args, current)
+                current = ""
+            } else {
+                current += string(c)
+            }
+        } else {
+            if c == '\'' || c == '"' {
+                inQuotes = true
+                quoteChar = c
+            } else if c == ' ' {
+                if current != "" {
+                    args = append(args, current)
+                    current = ""
+                }
+            } else {
+                current += string(c)
+            }
+        }
+    }
+    if current != "" {
+        args = append(args, current)
+    }
+    return args
+}
 
 type ShellCompleter struct{}
 
@@ -352,27 +386,48 @@ func main() {
 				fmt.Println(cmdName + ": not found")
 			}
 		default:
-			parts := strings.Fields(trimmed)
+			parts := parseArgs(trimmed)
 			programName := parts[0]
 			arguments := parts[1:]
+
+			for _,arg := range  arguments {
+				fmt.Println(arg)
+			}
 			found = false
 			for _, path := range paths {
 				fullPath := path + "/" + programName
-				// if ((strings.HasPrefix(path, "'") && strings.HasSuffix(path, "'")) || (strings.HasPrefix(path, `"` ) && strings.HasSuffix(path, `"`))) {
-				// 	fmt.Fprintln(os.Stdout,fullPath[1:len(fullPath)-1])
-				// } 
+
 				if fileInfo, err := os.Stat(fullPath); err == nil {
 					if fileInfo.Mode().IsRegular() && fileInfo.Mode()&0111 != 0 {
-						cmd := exec.Command(programName, arguments...)
-						cmd.Stdout = os.Stdout // allows me to get the output in my shell
-						cmd.Stderr = os.Stderr // allows me to get the error output in my shell
-						err := cmd.Run()
-						if err != nil {
+						if strings.Contains(arguments[0], "'") || strings.Contains(arguments[0], `"`) {
+
+							
+							cmd := exec.Command(programName, arguments...)
+							cmd.Stdout = os.Stdout
+							cmd.Stderr = os.Stderr
+							err := cmd.Run()
+							if err != nil {
+								log.Fatalf("Error executing the program: %s %v", programName, arguments)
+								return
+							}
+							found = true
+							break
+						}else {
+							cmd := exec.Command(programName, arguments...)
+							cmd.Stdout = os.Stdout // allows me to get the output in my shell
+							cmd.Stderr = os.Stderr // allows me to get the error output in my shell
+							err := cmd.Run()
+							if err != nil {
+								log.Fatalf("Error executing the program: %s %v", programName, arguments)
+								return
+							}
+							if err != nil {
 							log.Fatalf("Error executing the program: %s %v", programName, arguments)
 							return
 						}
-						found = true
-						break
+							found = true
+							break
+						}
 					}
 				}
 			}
