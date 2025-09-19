@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -71,43 +72,31 @@ func quotedStrings(s string) string {
 	s = strings.ReplaceAll(s, `"`, "")
 	return strings.TrimSpace(s)
 }
-func parseArgs(input string) []string {
-    var args []string
-    var current string
-    inQuotes := false
-    quoteChar := byte(0)
-    for i := 0; i < len(input); i++ {
-        c := input[i]
-        if inQuotes {
-            if c == quoteChar {
-                inQuotes = false
-                args = append(args, current)
-                current = ""
-            } else {
-                current += string(c)
-            }
-        } else {
-            if c == '\'' || c == '"' {
-                inQuotes = true
-                quoteChar = c
-            } else if c == ' ' {
-                if current != "" {
-                    args = append(args, current)
-                    current = ""
-                }
-            } else {
-                current += string(c)
-            }
-        }
-    }
-    if current != "" {
-        args = append(args, current)
-    }
-    return args
-}
+
 
 type ShellCompleter struct{}
-
+func echoHandler(input string) {
+    // This regex matches quoted strings or unquoted words
+    re := regexp.MustCompile(`"([^"]*)"|'([^']*)'|(\S+)`)
+    matches := re.FindAllString(input, -1)
+    result := ""
+    lastEnd := 0
+    for _, match := range matches {
+        start := strings.Index(input[lastEnd:], match) + lastEnd
+        // Add space only if there was a space before this argument
+        if start > lastEnd {
+            result += " "
+        }
+        // Remove surrounding quotes
+        if (strings.HasPrefix(match, "\"") && strings.HasSuffix(match, "\"")) ||
+            (strings.HasPrefix(match, "'") && strings.HasSuffix(match, "'")) {
+            match = match[1 : len(match)-1]
+        }
+        result += match
+        lastEnd = start + len(match)
+    }
+    fmt.Fprintln(os.Stdout, result)
+}
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
 	matches := findExecutables(input)
@@ -352,16 +341,7 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
-			args := parseArgs(arg)
-			// Print arguments, but only add a space if the previous argument was not directly adjacent (i.e., not between two quoted strings)
-			for i, a := range args {
-				fmt.Fprint(os.Stdout, a)
-				// Add a space if not the last argument
-				if i < len(args)-1 {
-					fmt.Fprint(os.Stdout, " ")
-				}
-			}
-			fmt.Fprintln(os.Stdout)
+			echoHandler(arg)
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
