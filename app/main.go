@@ -66,9 +66,9 @@ func quotedStrings(s string) string {
 				s = strings.Replace(s, `"`, "", -1)
 			}
 		}
-	}
-	s = strings.Replace(s, "`", "", -1)
-	s = strings.Replace(s, `"`, "", -1)
+	} 
+	s = strings.ReplaceAll(s, `''`, "")
+	s = strings.ReplaceAll(s, `"`, "")
 	return s
 }
 func parseArgs(input string) []string {
