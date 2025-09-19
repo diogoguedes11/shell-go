@@ -54,7 +54,7 @@ func contains(slice []string, item string) bool {
     }
     return false
 }
-
+// Quoted sttrings
 func quotedStrings(s string) string {
 	if len(s) >= 2 && ((strings.HasPrefix(s, "'") && strings.HasSuffix(s, "'")) || (strings.HasPrefix(s, `"` ) && strings.HasSuffix(s, `"`))) {
 		for _, c := range s {
