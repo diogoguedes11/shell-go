@@ -108,25 +108,24 @@ func parseArgs(input string) []string {
 }
 
 type ShellCompleter struct{}
+
 func echoHandler(input string) {
-    // This regex matches quoted strings or unquoted words
+    // Regex matches quoted strings or unquoted words
     re := regexp.MustCompile(`"([^"]*)"|'([^']*)'|(\S+)`)
-    matches := re.FindAllString(input, -1)
+    matches := re.FindAllStringIndex(input, -1)
     result := ""
-    lastEnd := 0
-    for _, match := range matches {
-        start := strings.Index(input[lastEnd:], match) + lastEnd
-        // Add space only if there was a space before this argument
-        if start > lastEnd {
+    for i, match := range matches {
+        arg := input[match[0]:match[1]]
+        // Remove surrounding quotes
+        if (strings.HasPrefix(arg, "\"") && strings.HasSuffix(arg, "\"")) ||
+            (strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) {
+            arg = arg[1 : len(arg)-1]
+        }
+        // Add space only if there is a space between this and previous argument in the input
+        if i > 0 && match[0] > matches[i-1][1] {
             result += " "
         }
-        // Remove surrounding quotes
-        if (strings.HasPrefix(match, "\"") && strings.HasSuffix(match, "\"")) ||
-            (strings.HasPrefix(match, "'") && strings.HasSuffix(match, "'")) {
-            match = match[1 : len(match)-1]
-        }
-        result += match
-        lastEnd = start + len(match)
+        result += arg
     }
     fmt.Fprintln(os.Stdout, result)
 }
