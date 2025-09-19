@@ -116,7 +116,6 @@ func echoHandler(input string) {
     result := ""
     for i, match := range matches {
         arg := input[match[0]:match[1]]
-        // Remove surrounding quotes
         if (strings.HasPrefix(arg, "\"") && strings.HasSuffix(arg, "\"")) ||
             (strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) {
             arg = arg[1 : len(arg)-1]
@@ -127,6 +126,9 @@ func echoHandler(input string) {
         }
         result += arg
     }
+    result = strings.ReplaceAll(result, `''`, "")
+    result = strings.ReplaceAll(result, `""`, "")
+    
     fmt.Fprintln(os.Stdout, result)
 }
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
