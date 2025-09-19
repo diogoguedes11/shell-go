@@ -126,6 +126,7 @@ func echoHandler(input string) {
         }
         result += arg
     }
+    // remove any remaining quotes
     result = strings.ReplaceAll(result, `''`, "")
     result = strings.ReplaceAll(result, `""`, "")
     
