@@ -72,7 +72,40 @@ func quotedStrings(s string) string {
 	s = strings.ReplaceAll(s, `"`, "")
 	return strings.TrimSpace(s)
 }
-
+func parseArgs(input string) []string {
+    var args []string
+    var current string
+    inQuotes := false
+    quoteChar := byte(0)
+    for i := 0; i < len(input); i++ {
+        c := input[i]
+        if inQuotes {
+            if c == quoteChar {
+                inQuotes = false
+                args = append(args, current)
+                current = ""
+            } else {
+                current += string(c)
+            }
+        } else {
+            if c == '\'' || c == '"' {
+                inQuotes = true
+                quoteChar = c
+            } else if c == ' ' {
+                if current != "" {
+                    args = append(args, current)
+                    current = ""
+                }
+            } else {
+                current += string(c)
+            }
+        }
+    }
+    if current != "" {
+        args = append(args, current)
+    }
+    return args
+}
 
 type ShellCompleter struct{}
 func echoHandler(input string) {
