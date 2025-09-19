@@ -352,13 +352,16 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
-			
-			if strings.HasPrefix(arg, "'")  || strings.HasPrefix(arg, `"`) {
-				fmt.Fprintln(os.Stdout, quotedStrings(arg[1:]))
-			
-			} else {
-				fmt.Fprintln(os.Stdout, strings.Join(strings.Fields(arg), " "))
+			args := parseArgs(arg)
+			// Print arguments, but only add a space if the previous argument was not directly adjacent (i.e., not between two quoted strings)
+			for i, a := range args {
+				fmt.Fprint(os.Stdout, a)
+				// Add a space if not the last argument
+				if i < len(args)-1 {
+					fmt.Fprint(os.Stdout, " ")
+				}
 			}
+			fmt.Fprintln(os.Stdout)
 		case strings.HasPrefix(trimmed,"exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
