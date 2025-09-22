@@ -99,6 +99,8 @@ func echoHandler(input string) {
 	} else {
 		input = strings.ReplaceAll(input, `"`, "")
 		input = strings.ReplaceAll(input, `'`, "")
+		input = strings.ReplaceAll(input, "`", "")
+		input = strings.Join(strings.Fields(input), " ")
 		fmt.Fprintln(os.Stdout, input)
 	}
 }
