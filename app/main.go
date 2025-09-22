@@ -92,14 +92,16 @@ func parseArgs(input string) []string {
 type ShellCompleter struct{}
 
 func echoHandler(input string) {
-	
-    processed := removeBackslashEscapes(input)
-  
-    // Strip surrounding quotes if present
-    if len(processed) >= 2 && ((processed[0] == '"' && processed[len(processed)-1] == '"') || (processed[0] == '\'' && processed[len(processed)-1] == '\'')) {
-        processed = processed[1 : len(processed)-1]
-    }
-    fmt.Fprintln(os.Stdout, processed)
+
+	if strings.Contains(input, "\\") {
+		input = removeBackslashEscapes(input)
+		  // Strip surrounding quotes if present
+		fmt.Fprintln(os.Stdout, input)
+	} else {
+		input = strings.ReplaceAll(input, `"`, "")
+		input = strings.ReplaceAll(input, `'`, "")
+		fmt.Fprintln(os.Stdout, input)
+	}
 }
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
@@ -166,15 +168,15 @@ func removeBackslashEscapes(s string) string {
 	i := 0
 	inDouble := false
 	for i < len(s) {
-		if s[i] == '"' {
+		if s[i] == '"' || s[i] == '\'' {
 			inDouble = !inDouble
 		}
-		if s[i] == '\\' && i+1 < len(s) && s[i+1] == ' ' && !inDouble{
+		if s[i] == '\\' && i+1 < len(s) && s[i+1] == ' ' && !inDouble {
 			result += "  "
 			i += 2
 		}
-		if s[i] == '\\' && i+1 < len(s) && !inDouble  {
-			i+=2
+		if s[i] == '\\' && i+1 < len(s)   {
+			i++
 
 		} else {
 			result += string(s[i])
