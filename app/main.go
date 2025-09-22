@@ -93,6 +93,8 @@ type ShellCompleter struct{}
 
 func echoHandler(input string) {
     processed := removeBackslashEscapes(input)
+    processed = strings.ReplaceAll(processed, `"`, ``)
+     processed = strings.ReplaceAll(processed, `'`, ``)
     // Strip surrounding quotes if present
     if len(processed) >= 2 && ((processed[0] == '"' && processed[len(processed)-1] == '"') || (processed[0] == '\'' && processed[len(processed)-1] == '\'')) {
         processed = processed[1 : len(processed)-1]
