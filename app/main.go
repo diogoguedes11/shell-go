@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -55,23 +54,6 @@ func contains(slice []string, item string) bool {
     }
     return false
 }
-// Quoted strings
-func quotedStrings(s string) string {
-	if len(s) >= 2 && ((strings.HasPrefix(s, "'") && strings.HasSuffix(s, "'")) || (strings.HasPrefix(s, `"` ) && strings.HasSuffix(s, `"`))) {
-		for _, c := range s {
-			fmt.Fprintf(os.Stdout, "%v\n", string(c))
-			if strings.Contains(string(c), "'") {
-				s = strings.ReplaceAll(s, "'", "")
-			}
-			if strings.Contains(string(c), `"`) {
-				s = strings.Replace(s, `"`, "", -1)
-			}
-		}
-	} 
-	s = strings.ReplaceAll(s, `''`, "")
-	s = strings.ReplaceAll(s, `"`, "")
-	return strings.TrimSpace(s)
-}
 func parseArgs(input string) []string {
     var args []string
     var current string
@@ -110,26 +92,12 @@ func parseArgs(input string) []string {
 type ShellCompleter struct{}
 
 func echoHandler(input string) {
-    // Regex matches quoted strings or unquoted words
-    re := regexp.MustCompile(`"([^"]*)"|'([^']*)'|(\S+)`)
-    matches := re.FindAllStringIndex(input, -1)
-    result := ""
-    for i, match := range matches {
-        arg := input[match[0]:match[1]]
-        if (strings.HasPrefix(arg, "\"") && strings.HasSuffix(arg, "\"")) ||
-            (strings.HasPrefix(arg, "'") && strings.HasSuffix(arg, "'")) {
-            arg = arg[1 : len(arg)-1]
-        }
-        // Add space only if there is a space between this and previous argument in the input
-        if i > 0 && match[0] > matches[i-1][1] {
-            result += " "
-        }
-        result += arg
+    processed := removeBackslashEscapes(input)
+    // Strip surrounding quotes if present
+    if len(processed) >= 2 && ((processed[0] == '"' && processed[len(processed)-1] == '"') || (processed[0] == '\'' && processed[len(processed)-1] == '\'')) {
+        processed = processed[1 : len(processed)-1]
     }
-    result = strings.ReplaceAll(result, `''`, "")
-    result = strings.ReplaceAll(result, `""`, "")
-    
-    fmt.Fprintln(os.Stdout, result)
+    fmt.Fprintln(os.Stdout, processed)
 }
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
@@ -189,6 +157,30 @@ func findExecutables(prefix string) []string {
     }
     sort.Strings(matches)
     return matches
+}
+
+func removeBackslashEscapes(s string) string {
+	result := ""
+	i := 0
+	inDouble := false
+	for i < len(s) {
+		if s[i] == '"' {
+			inDouble = !inDouble
+		}
+		if s[i] == '\\' && i+1 < len(s) && s[i+1] == ' ' && !inDouble{
+			result += "  "
+			i += 2
+		}
+		if s[i] == '\\' && i+1 < len(s) && !inDouble  {
+			i+=2
+
+		} else {
+			result += string(s[i])
+			i++
+		}
+	}
+
+	return  result
 }
 
 func main() {
