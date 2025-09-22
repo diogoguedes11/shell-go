@@ -95,7 +95,6 @@ func echoHandler(input string) {
 
 	if strings.Contains(input, "\\") {
 		input = removeBackslashEscapes(input)
-		  // Strip surrounding quotes if present
 		fmt.Fprintln(os.Stdout, input)
 	} else {
 		input = strings.ReplaceAll(input, `"`, "")
@@ -172,7 +171,7 @@ func removeBackslashEscapes(s string) string {
 			inDouble = !inDouble
 		}
 		if s[i] == '\\' && i+1 < len(s) && s[i+1] == ' ' && !inDouble {
-			result += "  "
+			result += " "
 			i += 2
 		}
 		if s[i] == '\\' && i+1 < len(s)   {
