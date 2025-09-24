@@ -104,6 +104,29 @@ func echoHandler(input string) {
 		fmt.Fprintln(os.Stdout, processed)
 	}
 }
+func removeBackslashEscapes(s string) string {
+	result := ""
+	i := 0
+	inDouble := false
+	for i < len(s) {
+		if s[i] == '"' {
+			inDouble = !inDouble
+			result += string(s[i])
+			i++
+			continue
+		}
+		if s[i] == '\\' && i+1 < len(s) && !inDouble {
+			// Escape: skip \ and add the next char
+			i++
+			result += string(s[i])
+			i++
+		} else {
+			result += string(s[i])
+			i++
+		}
+	}
+	return result
+}
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
 	matches := findExecutables(input)
@@ -162,30 +185,6 @@ func findExecutables(prefix string) []string {
 	}
 	sort.Strings(matches)
 	return matches
-}
-
-func removeBackslashEscapes(s string) string {
-	result := ""
-	i := 0
-	inDouble := false
-	for i < len(s) {
-		if s[i] == '"' || s[i] == '\'' {
-			inDouble = !inDouble
-		}
-		if s[i] == '\\' && i+1 < len(s) && s[i+1] == ' ' && !inDouble {
-			result += " "
-			i += 2
-		}
-		if s[i] == '\\' && i+1 < len(s) {
-			i++
-
-		} else {
-			result += string(s[i])
-			i++
-		}
-	}
-
-	return result
 }
 
 func main() {
