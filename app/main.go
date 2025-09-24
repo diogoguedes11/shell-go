@@ -92,13 +92,17 @@ func parseArgs(input string) []string {
 
 type ShellCompleter struct{}
 
-func echoHandler(input string) {
-	processed := removeBackslashEscapes(input)
-	// handle quotes
-	if strings.HasPrefix(processed, `"`) {
-		processed = strings.ReplaceAll(processed, `"`, "")
+func echoHandler(args []string) {
+	processedArgs := make([]string, len(args))
+	for i, arg := range args {
+		processed := removeBackslashEscapes(arg)
+		// handle quotes
+		if strings.HasPrefix(processed, `"`) {
+			processed = strings.ReplaceAll(processed, `"`, "")
+		}
+		processedArgs[i] = processed
 	}
-	fmt.Fprintln(os.Stdout, processed)
+	fmt.Fprintln(os.Stdout, strings.Join(processedArgs, " "))
 }
 func removeBackslashEscapes(s string) string {
 	result := ""
