@@ -104,6 +104,12 @@ func echoHandler(args []string) {
 	}
 	fmt.Fprintln(os.Stdout, strings.Join(processedArgs, " "))
 }
+
+		}
+		processedArgs[i] = processed
+	}
+	fmt.Fprintln(os.Stdout, strings.Join(processedArgs, " "))
+}
 func removeBackslashEscapes(s string) string {
 	result := ""
 	i := 0
