@@ -103,9 +103,8 @@ func echoHandler(args []string) {
 	processedArgs := make([]string, len(args))
 	for i, arg := range args {
 		processed := removeBackslashEscapes(arg)
-		// handle quotes
-		if strings.HasPrefix(processed, `"`) {
-			processed = strings.ReplaceAll(processed, `"`, "")
+		if len(processed) > 1 && ((processed[0] == '"' && processed[len(processed)-1] == '"') || (processed[0] == '\'' && processed[len(processed)-1] == '\'')) {
+			processed = processed[1 : len(processed)-1]
 		}
 		processedArgs[i] = processed
 	}
@@ -212,8 +211,10 @@ func main() {
 		DisableAutoSaveHistory: false,
 		EOFPrompt:              "exit",
 		InterruptPrompt:        "^C",
+		HistorySearchFold:      true,
 	}
 	rl, err := readline.NewEx(config)
+	history := []string{}
 	if err != nil {
 		fmt.Fprint(os.Stderr, "Error creating readline instance: ", err)
 		os.Exit(1)
@@ -228,6 +229,7 @@ func main() {
 			break
 		}
 		trimmed := strings.TrimSpace(command)
+		history = append(history, trimmed)
 		switch {
 		case trimmed == "exit 0":
 			os.Exit(0)
@@ -389,6 +391,11 @@ func main() {
 			argStr := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			args := parseArgs(argStr)
 			echoHandler(args)
+		case strings.HasPrefix(trimmed, "history"):
+			// Print the history list
+			for i, line := range history {
+				fmt.Printf("%d %s\n", i+1, line)
+			}
 		case strings.HasPrefix(trimmed, "exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
@@ -400,7 +407,7 @@ func main() {
 			}
 		case strings.HasPrefix(trimmed, "type"):
 			cmdName := trimmed[len("type")+1:]
-			if cmdName == "echo" || cmdName == "type" || cmdName == "exit" || cmdName == "pwd" {
+			if cmdName == "echo" || cmdName == "type" || cmdName == "exit" || cmdName == "pwd" || cmdName == "cd" || cmdName == "history" {
 				fmt.Printf("%s is a shell builtin\n", cmdName)
 				break
 			} else {
