@@ -393,9 +393,17 @@ func main() {
 			echoHandler(args)
 		case strings.HasPrefix(trimmed, "history"):
 			// Print the history list
-			for i, line := range history {
-				fmt.Printf("%d %s\n", i+1, line)
+			if len(trimmed) > 7 {
+				arg := trimmed[7 : len(trimmed)-1]
+				for i, line := range arg {
+					fmt.Printf("%d %s\n", i+1, line)
+				}
+			} else {
+				for i, line := range history {
+					fmt.Printf("%d %s\n", i+1, line)
+				}
 			}
+
 		case strings.HasPrefix(trimmed, "exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
