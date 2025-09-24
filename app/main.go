@@ -60,8 +60,15 @@ func parseArgs(input string) []string {
 	var current string
 	inQuotes := false
 	quoteChar := byte(0)
+	var wasEscaped bool
 	for i := 0; i < len(input); i++ {
 		c := input[i]
+		wasEscaped = false
+		if !inQuotes && c == '\\' && i+1 < len(input) {
+			i++
+			c = input[i]
+			wasEscaped = true
+		}
 		if inQuotes {
 			if c == quoteChar {
 				inQuotes = false
@@ -74,7 +81,7 @@ func parseArgs(input string) []string {
 			if c == '\'' || c == '"' {
 				inQuotes = true
 				quoteChar = c
-			} else if c == ' ' {
+			} else if c == ' ' && !wasEscaped {
 				if current != "" {
 					args = append(args, current)
 					current = ""
