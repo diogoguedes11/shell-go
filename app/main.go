@@ -379,8 +379,9 @@ func main() {
 				continue
 			}
 		case strings.HasPrefix(trimmed, "echo"):
-			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
-			echoHandler(arg)
+			argStr := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
+			args := parseArgs(argStr)
+			echoHandler(args)
 		case strings.HasPrefix(trimmed, "exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
