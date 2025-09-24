@@ -94,6 +94,7 @@ type ShellCompleter struct{}
 
 func echoHandler(input string) {
 	processed := removeBackslashEscapes(input)
+	// handle quotes
 	if strings.HasPrefix(processed, "\"\"") {
 		processed = processed[1 : len(processed)-1]
 	}
