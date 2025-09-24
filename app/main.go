@@ -94,16 +94,10 @@ type ShellCompleter struct{}
 
 func echoHandler(input string) {
 
-	if strings.Contains(input, "\\") {
-		input = removeBackslashEscapes(input)
-		fmt.Fprintln(os.Stdout, input)
-	} else {
-		input = strings.ReplaceAll(input, `"`, "")
-		input = strings.ReplaceAll(input, `'`, "")
-		input = strings.ReplaceAll(input, "`", "")
-		input = strings.Join(strings.Fields(input), " ")
-		fmt.Fprintln(os.Stdout, input)
-	}
+	processed := removeBackslashEscapes(input)
+	args := parseArgs(processed)
+	result := strings.Join(args, " ")
+	fmt.Fprintln(os.Stdout, result)
 }
 func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	input := string(line[:pos])
