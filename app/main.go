@@ -93,25 +93,25 @@ func parseArgs(input string) []string {
 type ShellCompleter struct{}
 
 func echoHandler(input string) {
-
-	if strings.Contains(input, "\"") || strings.Contains(input, "'") {
-		processed := removeBackslashEscapes(input)
-		args := parseArgs(processed)
-		result := strings.Join(args, " ")
-		fmt.Fprintln(os.Stdout, result)
-	} else {
-		processed := removeBackslashEscapes(input)
-		fmt.Fprintln(os.Stdout, processed)
-	}
+	processed := removeBackslashEscapes(input)
+	fmt.Fprintln(os.Stdout, processed)
 }
 func removeBackslashEscapes(s string) string {
 	result := ""
 	i := 0
 	inDouble := false
+	inSingle := false
 	for i < len(s) {
 		if s[i] == '"' {
 			inDouble = !inDouble
 			result += string(s[i])
+			i++
+			continue
+		}
+		if s[i] == '\'' && !inDouble {
+			inSingle = !inSingle
+			result += string(s[i])
+			fmt.Println(result)
 			i++
 			continue
 		}
