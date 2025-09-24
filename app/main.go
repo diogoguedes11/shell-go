@@ -94,6 +94,9 @@ type ShellCompleter struct{}
 
 func echoHandler(input string) {
 	processed := removeBackslashEscapes(input)
+	if strings.HasPrefix(processed, "\"\"") {
+		processed = processed[1 : len(processed)-1]
+	}
 	fmt.Fprintln(os.Stdout, processed)
 }
 func removeBackslashEscapes(s string) string {
