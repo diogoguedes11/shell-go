@@ -14,8 +14,9 @@ import (
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
 var _ = fmt.Fprint
-func findLongestCommonPrefix(input string,matches []string) string {
-	if len(matches) == 0{
+
+func findLongestCommonPrefix(input string, matches []string) string {
+	if len(matches) == 0 {
 		return ""
 	}
 	minLen := -1
@@ -28,16 +29,16 @@ func findLongestCommonPrefix(input string,matches []string) string {
 		return ""
 	}
 	for i := 0; i < minLen; i++ {
-    		ch := matches[0][i]
+		ch := matches[0][i]
 		for _, m := range matches {
 			if m[i] != ch {
 				if i < len(input) {
 					print("\a")
 					return ""
 				}
-					print("\a")
-					return matches[0][:i]	
-			} 
+				print("\a")
+				return matches[0][:i]
+			}
 		}
 	}
 	if minLen < len(input) {
@@ -47,46 +48,46 @@ func findLongestCommonPrefix(input string,matches []string) string {
 	return matches[0][:minLen]
 }
 func contains(slice []string, item string) bool {
-    for _, s := range slice {
-        if s == item {
-            return true
-        }
-    }
-    return false
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 func parseArgs(input string) []string {
-    var args []string
-    var current string
-    inQuotes := false
-    quoteChar := byte(0)
-    for i := 0; i < len(input); i++ {
-        c := input[i]
-        if inQuotes {
-            if c == quoteChar {
-                inQuotes = false
-                args = append(args, current)
-                current = ""
-            } else {
-                current += string(c)
-            }
-        } else {
-            if c == '\'' || c == '"' {
-                inQuotes = true
-                quoteChar = c
-            } else if c == ' ' {
-                if current != "" {
-                    args = append(args, current)
-                    current = ""
-                }
-            } else {
-                current += string(c)
-            }
-        }
-    }
-    if current != "" {
-        args = append(args, current)
-    }
-    return args
+	var args []string
+	var current string
+	inQuotes := false
+	quoteChar := byte(0)
+	for i := 0; i < len(input); i++ {
+		c := input[i]
+		if inQuotes {
+			if c == quoteChar {
+				inQuotes = false
+				args = append(args, current)
+				current = ""
+			} else {
+				current += string(c)
+			}
+		} else {
+			if c == '\'' || c == '"' {
+				inQuotes = true
+				quoteChar = c
+			} else if c == ' ' {
+				if current != "" {
+					args = append(args, current)
+					current = ""
+				}
+			} else {
+				current += string(c)
+			}
+		}
+	}
+	if current != "" {
+		args = append(args, current)
+	}
+	return args
 }
 
 type ShellCompleter struct{}
@@ -109,59 +110,59 @@ func (c *ShellCompleter) Do(line []rune, pos int) ([][]rune, int) {
 	matches := findExecutables(input)
 	builtins := []string{"cd", "echo", "exit", "pwd", "type"}
 	for _, b := range builtins {
-		if strings.HasPrefix(b, input) && !contains(matches,b) {
+		if strings.HasPrefix(b, input) && !contains(matches, b) {
 			matches = append(matches, b)
 		}
 	}
 	sort.Strings(matches)
 	if len(matches) == 0 {
-			print("\a")
+		print("\a")
 		return nil, 0
 	}
 	if len(matches) == 1 {
 		completion := matches[0][len(input):]
-		if input + completion == matches[0] {
+		if input+completion == matches[0] {
 			return [][]rune{[]rune(completion + " ")}, len(input)
 		}
 	}
 	if len(matches) > 1 {
-        commonPrefix := findLongestCommonPrefix(input, matches)
-        // only take the tail if the common prefix is longer than the input
-        if len(commonPrefix) > len(input) {
-            completion := commonPrefix[len(input):]
-            return [][]rune{[]rune(completion)}, len(input)
-        }
-        fmt.Fprint(os.Stdout, "\n")
-        for i, m := range matches {
-            if i > 0 {
-                fmt.Fprint(os.Stdout, "  ")
-            }
-            fmt.Fprint(os.Stdout, m)
-        }
-        fmt.Fprintf(os.Stdout, "\n$ %s", input)
-        return nil, 0
-    }
-    	return nil, 0
+		commonPrefix := findLongestCommonPrefix(input, matches)
+		// only take the tail if the common prefix is longer than the input
+		if len(commonPrefix) > len(input) {
+			completion := commonPrefix[len(input):]
+			return [][]rune{[]rune(completion)}, len(input)
+		}
+		fmt.Fprint(os.Stdout, "\n")
+		for i, m := range matches {
+			if i > 0 {
+				fmt.Fprint(os.Stdout, "  ")
+			}
+			fmt.Fprint(os.Stdout, m)
+		}
+		fmt.Fprintf(os.Stdout, "\n$ %s", input)
+		return nil, 0
+	}
+	return nil, 0
 }
 
 func findExecutables(prefix string) []string {
-    var matches []string
-    paths := strings.Split(os.Getenv("PATH"), ":")
-    
-    for _, path := range paths {
-        entries, err := os.ReadDir(path)
-        if err != nil {
-            continue
-        }
-        for _, e := range entries {
-            name := e.Name()
-            if strings.HasPrefix(name, prefix) && !contains(matches,name) {
-                matches = append(matches, name)
-            }
-        }
-    }
-    sort.Strings(matches)
-    return matches
+	var matches []string
+	paths := strings.Split(os.Getenv("PATH"), ":")
+
+	for _, path := range paths {
+		entries, err := os.ReadDir(path)
+		if err != nil {
+			continue
+		}
+		for _, e := range entries {
+			name := e.Name()
+			if strings.HasPrefix(name, prefix) && !contains(matches, name) {
+				matches = append(matches, name)
+			}
+		}
+	}
+	sort.Strings(matches)
+	return matches
 }
 
 func removeBackslashEscapes(s string) string {
@@ -176,7 +177,7 @@ func removeBackslashEscapes(s string) string {
 			result += " "
 			i += 2
 		}
-		if s[i] == '\\' && i+1 < len(s)   {
+		if s[i] == '\\' && i+1 < len(s) {
 			i++
 
 		} else {
@@ -185,18 +186,18 @@ func removeBackslashEscapes(s string) string {
 		}
 	}
 
-	return  result
+	return result
 }
 
 func main() {
 	paths := strings.Split(os.Getenv("PATH"), ":")
 	found := false
 	config := &readline.Config{
-		Prompt:       "$ ",
-		AutoComplete: &ShellCompleter{},
+		Prompt:                 "$ ",
+		AutoComplete:           &ShellCompleter{},
 		DisableAutoSaveHistory: false,
-		EOFPrompt: "exit",
-		InterruptPrompt: "^C",
+		EOFPrompt:              "exit",
+		InterruptPrompt:        "^C",
 	}
 	rl, err := readline.NewEx(config)
 	if err != nil {
@@ -205,7 +206,7 @@ func main() {
 	}
 	for {
 		// fmt.Fprint(os.Stdout, "$ ")
-		
+
 		command, err := rl.Readline()
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error reading command: ", err)
@@ -373,7 +374,7 @@ func main() {
 		case strings.HasPrefix(trimmed, "echo"):
 			arg := strings.TrimSpace(strings.TrimPrefix(trimmed, "echo"))
 			echoHandler(arg)
-		case strings.HasPrefix(trimmed,"exit"):
+		case strings.HasPrefix(trimmed, "exit"):
 			os.Exit(0)
 		case strings.HasPrefix(trimmed, "pwd"):
 			pwd, err := os.Getwd()
