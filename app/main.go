@@ -394,10 +394,11 @@ func main() {
 		case strings.HasPrefix(trimmed, "history"):
 			// Print the history list
 			if len(trimmed) > 7 {
-				arg := trimmed[7 : len(trimmed)-1]
-				for i, line := range arg {
-					fmt.Printf("%d %s\n", i+1, line)
-				}
+				// TODO: handle argument to history command
+				// arg := trimmed[7 : len(trimmed)-1]
+				// for i, line := range arg {
+				// 	fmt.Printf("%d %s\n", i+1, line)
+				// }
 			} else {
 				for i, line := range history {
 					fmt.Printf("%d %s\n", i+1, line)
