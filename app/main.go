@@ -96,7 +96,7 @@ func echoHandler(input string) {
 	processed := removeBackslashEscapes(input)
 	// handle quotes
 	if strings.HasPrefix(processed, `"`) {
-		processed = processed[1 : len(processed)-1]
+		processed = strings.ReplaceAll(processed, `"`, "")
 	}
 	fmt.Fprintln(os.Stdout, processed)
 }
