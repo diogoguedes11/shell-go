@@ -401,8 +401,8 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Invalid history number: %v\n", err)
 					break
 				}
-				for i := 0; i < len(history) && i < historyNum; i++ {
-					fmt.Printf("%d %s\n", i+1, history[i])
+				for i := len(history); i > 0 && i > historyNum; i-- {
+					fmt.Printf("%d %s\n", i, history[i-1])
 				}
 			} else {
 				for i, line := range history {
@@ -476,7 +476,7 @@ func main() {
 				}
 			}
 			if !found {
-				fmt.Println(programName + ": not found")
+				fmt.Println(programName + ": command not found")
 			}
 		}
 	}
