@@ -394,6 +394,7 @@ func main() {
 			echoHandler(args)
 		case strings.HasPrefix(trimmed, "history"):
 			// Print the history list
+			effectiveLen := len(history) - 1
 			if len(trimmed) > 7 {
 				historyNumStr := trimmed[len("history")+1:]
 				historyNum, err := strconv.Atoi(historyNumStr)
@@ -401,8 +402,12 @@ func main() {
 					fmt.Fprintf(os.Stderr, "Invalid history number: %v\n", err)
 					break
 				}
-				for i := len(history); i > 0 && i > historyNum; i-- {
-					fmt.Printf("%d %s\n", i, history[i-1])
+				start := effectiveLen - historyNum
+				if start < 0 {
+					start = 0
+				}
+				for i := start; i < effectiveLen; i++ {
+					fmt.Printf("%d %s\n", i+1, history[i])
 				}
 			} else {
 				for i, line := range history {
