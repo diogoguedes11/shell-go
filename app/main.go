@@ -443,7 +443,7 @@ func main() {
 				}
 			}
 			if !found {
-				fmt.Println(cmdName + ": command not found")
+				fmt.Println(cmdName + ": not found")
 			}
 		default:
 			parts := parseArgs(trimmed)
