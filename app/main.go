@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -394,11 +395,15 @@ func main() {
 		case strings.HasPrefix(trimmed, "history"):
 			// Print the history list
 			if len(trimmed) > 7 {
-				// TODO: handle argument to history command
-				// arg := trimmed[7 : len(trimmed)-1]
-				// for i, line := range arg {
-				// 	fmt.Printf("%d %s\n", i+1, line)
-				// }
+				historyNumStr := trimmed[len("history")+1:]
+				historyNum, err := strconv.Atoi(historyNumStr)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Invalid history number: %v\n", err)
+					break
+				}
+				for i := 0; i < len(history) && i < historyNum; i++ {
+					fmt.Printf("%d %s\n", i+1, history[i])
+				}
 			} else {
 				for i, line := range history {
 					fmt.Printf("%d %s\n", i+1, line)
@@ -433,7 +438,7 @@ func main() {
 				}
 			}
 			if !found {
-				fmt.Println(cmdName + ": not found")
+				fmt.Println(cmdName + ": command not found")
 			}
 		default:
 			parts := parseArgs(trimmed)
