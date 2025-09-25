@@ -394,7 +394,7 @@ func main() {
 			echoHandler(args)
 		case strings.HasPrefix(trimmed, "history"):
 			// Print the history list
-			effectiveLen := len(history) - 1
+			effectiveLen := len(history)
 			if len(trimmed) > 7 {
 				historyNumStr := trimmed[len("history")+1:]
 				historyNum, err := strconv.Atoi(historyNumStr)
